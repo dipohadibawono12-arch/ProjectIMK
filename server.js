@@ -4,7 +4,9 @@ const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = __dirname;
-const DB_PATH = path.join(ROOT_DIR, 'data', 'db.json');
+const IS_VERCEL = Boolean(process.env.VERCEL);
+const INITIAL_DB_PATH = path.join(ROOT_DIR, 'data', 'db.json');
+const DB_PATH = IS_VERCEL ? '/tmp/db.json' : INITIAL_DB_PATH;
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -18,12 +20,24 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+function ensureDB() {
+  if (IS_VERCEL && !fs.existsSync(DB_PATH)) {
+    try {
+      fs.copyFileSync(INITIAL_DB_PATH, DB_PATH);
+    } catch (err) {
+      console.error('Error copying db.json to /tmp:', err);
+    }
+  }
+}
+
 function readDB() {
+  ensureDB();
   const raw = fs.readFileSync(DB_PATH, 'utf-8');
   return JSON.parse(raw);
 }
 
 function writeDB(data) {
+  ensureDB();
   fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), 'utf-8');
 }
 
@@ -353,6 +367,10 @@ const server = http.createServer(async (req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
-server.listen(PORT, () => {
-  console.log(`SIPRK Universitas Brawijaya Server berjalan di http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  server.listen(PORT, () => {
+    console.log(`SIPRK Universitas Brawijaya Server berjalan di http://localhost:${PORT}`);
+  });
+}
+
+module.exports = server;
