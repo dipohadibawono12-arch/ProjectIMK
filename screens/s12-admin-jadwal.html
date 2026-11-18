@@ -782,7 +782,7 @@
           <div class="flex items-start justify-between gap-2 border-b border-outline-variant pb-2.5">
             <div>
               <div class="flex items-center gap-1.5">
-                <span class="px-2 py-0.5 bg-surface-container text-on-surface font-label-sm text-label-sm font-bold rounded">${s.courseCode || 'MK-UB'}</span>
+                <span class="px-2 py-0.5 bg-surface-container text-on-surface font-label-sm text-label-sm font-bold rounded">${s.code || s.courseCode || 'MK-UB'}</span>
                 <span class="font-label-sm text-label-sm text-on-surface-variant">Semester ${s.semester || '5'} (${s.day || 'Senin'})</span>
               </div>
               <h3 class="font-title-md text-title-md text-on-surface font-bold mt-1">${s.courseName}</h3>
@@ -881,10 +881,10 @@
     async function executeImportFinal() {
       closeConfirmImportModal();
       await window.SIPRK.addSchedule({
-        courseCode: 'IF-1101',
+        code: 'IF-1101',
         courseName: 'Algoritma & Pemrograman Dasar',
         semester: '1',
-        roomId: 'r1',
+        roomId: 'rt-102',
         roomCode: 'RT-102',
         roomName: 'Ruang Teori 1.2',
         building: 'GKB-A',

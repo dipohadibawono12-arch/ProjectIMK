@@ -99,6 +99,67 @@ const server = http.createServer(async (req, res) => {
   if (pathname === '/api/bookings' && req.method === 'POST') {
     const body = await parseBody(req);
     const db = readDB();
+
+    const roomId = body.roomId || 'rt-102';
+    const startVal = body.startTime || '08:40';
+    const endVal = body.endTime || '10:20';
+    const dateVal = body.date || '2026-10-22';
+
+    const timesOverlap = (aStart, aEnd, bStart, bEnd) => String(aStart) < String(bEnd) && String(aEnd) > String(bStart);
+    const getDayName = (ds) => {
+      const p = String(ds || '').split('-').map(Number);
+      if (p.length !== 3 || p.some(isNaN)) return 'Kamis';
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      return days[new Date(p[0], p[1] - 1, p[2]).getDay()] || 'Kamis';
+    };
+
+    if (!startVal || !endVal || String(startVal) >= String(endVal)) {
+      return sendJSON(res, 400, {
+        ok: false,
+        message: 'Rentang jam tidak valid. Jam selesai harus lebih besar dari jam mulai.'
+      });
+    }
+
+    const room = (db.rooms || []).find(r => r.id === roomId || r.code === roomId);
+    if (room && room.status === 'maintenance') {
+      return sendJSON(res, 400, {
+        ok: false,
+        message: room.maintenanceNote || 'Ruangan sedang dalam pemeliharaan sarpras.'
+      });
+    }
+
+    const targetRoomId = room ? room.id : roomId;
+    const dayName = getDayName(dateVal);
+
+    // Validasi backend identik dengan frontend: booking aktif, jadwal kuliah reguler sesuai hari, dan default slot
+    const hasBookingConflict = (db.bookings || []).some(b =>
+      b.roomId === targetRoomId &&
+      (b.status === 'disetujui' || b.status === 'menunggu') &&
+      b.date === dateVal &&
+      timesOverlap(b.startTime, b.endTime, startVal, endVal)
+    );
+
+    const hasSchConflict = (db.schedules || []).some(s =>
+      s.roomId === targetRoomId &&
+      s.status !== 'nonaktif' &&
+      s.day === dayName &&
+      timesOverlap(s.startTime, s.endTime, startVal, endVal)
+    );
+
+    const hasDefaultSlotConflict = room && (room.slots || []).some(sl => {
+      if (!['terpakai', 'menunggu', 'maintenance'].includes(sl.status)) return false;
+      const parts = String(sl.time || '').split(' - ').map(t => t.trim());
+      if (parts.length !== 2) return false;
+      return timesOverlap(parts[0], parts[1], startVal, endVal);
+    });
+
+    if (hasBookingConflict || hasSchConflict || hasDefaultSlotConflict) {
+      return sendJSON(res, 400, {
+        ok: false,
+        message: 'Jadwal ruangan bentrok dengan kegiatan atau perkuliahan lain. Pengajuan dibatalkan sistem.'
+      });
+    }
+
     const seq = String(db.bookings.length + 45).padStart(4, '0');
     const code = body.code || `SIPRK-261019-${seq}`;
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
@@ -215,6 +276,8 @@ const server = http.createServer(async (req, res) => {
         link: `s08-detail-peminjaman.html?id=${booking.id}`
       });
     } else if (updates.status === 'ditolak') {
+      if (updates.rejectionReason) booking.rejectionReason = updates.rejectionReason;
+      if (updates.rejectReason) booking.rejectionReason = updates.rejectReason;
       db.notifications.unshift({
         id: 'notif-' + Date.now(),
         targetRole: booking.userRole,
@@ -223,7 +286,7 @@ const server = http.createServer(async (req, res) => {
         icon: 'cancel',
         color: 'bg-[#F9DADD] text-[#D64550]',
         title: `Pengajuan ${booking.code} Ditolak`,
-        body: `Alasan: ${booking.rejectionReason || 'Bentrok jadwal / berkas belum lengkap.'}`,
+        body: `Alasan penolakan: ${booking.rejectionReason || 'Ruangan tidak dapat digunakan pada waktu tersebut.'}`,
         time: 'Baru saja',
         bookingId: booking.id,
         link: `s08-detail-peminjaman.html?id=${booking.id}`

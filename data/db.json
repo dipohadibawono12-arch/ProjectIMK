@@ -50,23 +50,6 @@
       "phone": "0813-5566-7788",
       "avatar": "PH",
       "homeScreen": "s10-admin-pengajuan.html"
-    },
-    {
-      "id": "u-fak-1",
-      "role": "fakultas",
-      "roleLabel": "Pimpinan Fakultas",
-      "name": "Dr. Sari Wijaya, S.T., M.MT.",
-      "shortName": "Bu Sari",
-      "email": "dekanat@ub.ac.id",
-      "idLabel": "NIP",
-      "idNumber": "197611042002122001",
-      "password": "fakultas123",
-      "prodi": "Wakil Dekan Bidang Umum & Keuangan - FILKOM UB",
-      "organization": "Pimpinan Fakultas & Sarpras UB",
-      "semester": "Periode Evaluasi 2026",
-      "phone": "0812-9900-1122",
-      "avatar": "BS",
-      "homeScreen": "s14-admin-dashboard.html"
     }
   ],
   "rooms": [
@@ -402,19 +385,19 @@
       "title": "Kelas Pengganti: Sistem Basis Data (SI-2A)",
       "participants": 38,
       "capacity": 50,
-      "status": "konflik",
+      "status": "ditolak",
       "priority": "Prioritas 2 • Mendesak H-0",
-      "conflictNote": "Bentrok dengan Kuliah Rutin PBO (13:00 - 14:40 WIB)",
-      "rejectionReason": "",
+      "conflictNote": "",
+      "rejectionReason": "Ruangan tidak dapat digunakan karena bentrok dengan jadwal Kuliah Rutin PBO (13:00 - 14:40 WIB).",
       "documentName": "RPS_Kelas_Pengganti_SBD.pdf",
       "documentSize": "1.2 MB",
       "createdAt": "19 Okt 2026, 09:15 WIB",
       "history": [
         {
-          "status": "Konflik Jadwal Terdeteksi",
-          "actor": "Sistem Deteksi Otomatis SIPRK",
-          "time": "19 Okt 2026, 09:15 WIB",
-          "note": "Slot beririsan dengan jadwal kuliah rutin PBO (13:00 - 14:40). Menunggu resolusi Admin Sarpras."
+          "status": "Ditolak Admin Sarpras",
+          "actor": "Hadi Suryono, S.AP.",
+          "time": "19 Okt 2026, 09:20 WIB",
+          "note": "Alasan: Ruangan tidak dapat digunakan karena bentrok dengan jadwal Kuliah Rutin PBO (13:00 - 14:40 WIB)."
         },
         {
           "status": "Pengajuan Dibuat",

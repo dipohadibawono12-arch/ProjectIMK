@@ -93,16 +93,18 @@
       </div>
 
       <!-- Real Conflict Warning Banner (PNJ-04) -->
-      <div class="hidden bg-[#FFF1E6] border-l-4 border-[#F2A35E] p-3 rounded-r-xl text-xs" id="conflict-banner">
-        <div class="flex items-start gap-2">
-          <span class="material-symbols-outlined text-[#D46B1D] text-[19px] shrink-0">warning</span>
-          <div>
-            <p class="font-bold text-[#8C3F08]">Jadwal Beririsan dengan Kuliah Reguler</p>
-            <p id="conflict-detail-text" class="text-[11px] text-[#111d28] mt-0.5">Ruangan terpakai pada jam tersebut. Silakan pilih jam alternatif.</p>
-            <button onclick="resolveConflictTime()" type="button" class="mt-2 px-2.5 py-1 bg-white text-[#1F5FA8] border border-[#1F5FA8] rounded-lg text-[11px] font-bold">
-              Gunakan Slot Kosong 13:00 - 15:00 WIB
-            </button>
+      <div class="hidden bg-[#FFF1E6] border-l-4 border-[#F2A35E] p-3.5 rounded-r-xl text-xs space-y-2" id="conflict-banner">
+        <div class="flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-[#D46B1D] text-[20px] shrink-0 mt-0.5">warning</span>
+          <div class="space-y-1">
+            <p id="conflict-title-text" class="font-bold text-[#8C3F08]">Jadwal Beririsan dengan Kuliah Reguler</p>
+            <p id="conflict-detail-text" class="text-[11px] text-[#111d28] leading-relaxed">Bentrok dengan kegiatan lain. Ruangan tidak dapat diajukan pada slot ini.</p>
           </div>
+        </div>
+        <div class="pt-1">
+          <button id="btn-use-empty-slot" onclick="resolveConflictTime()" type="button" class="w-full py-2 px-3 bg-white text-[#1F5FA8] border border-[#1F5FA8] rounded-xl text-xs font-bold shadow-2xs hover:bg-[#edf4ff] text-center transition-all">
+            Gunakan Slot Kosong 13:00 - 15:00 WIB
+          </button>
         </div>
       </div>
 
@@ -139,9 +141,9 @@
             <label class="block text-xs font-bold text-[#111d28] mb-1">Jam Mulai <span class="text-[#D64550]">*</span></label>
             <select id="input-jam-mulai" onchange="handleRoomOrTimeChange()" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]">
               <option value="07:00">07:00 WIB</option>
-              <option value="08:00">08:00 WIB (Cek Konflik)</option>
-              <option value="08:40">08:40 WIB</option>
-              <option value="10:20" selected>10:20 WIB</option>
+              <option value="08:00">08:00 WIB</option>
+              <option value="08:40" selected>08:40 WIB</option>
+              <option value="10:20">10:20 WIB</option>
               <option value="13:00">13:00 WIB</option>
               <option value="15:00">15:00 WIB</option>
             </select>
@@ -150,8 +152,8 @@
             <label class="block text-xs font-bold text-[#111d28] mb-1">Jam Selesai <span class="text-[#D64550]">*</span></label>
             <select id="input-jam-selesai" onchange="handleRoomOrTimeChange()" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]">
               <option value="08:40">08:40 WIB</option>
-              <option value="10:20">10:20 WIB</option>
-              <option value="12:00" selected>12:00 WIB</option>
+              <option value="10:20" selected>10:20 WIB</option>
+              <option value="12:00">12:00 WIB</option>
               <option value="14:40">14:40 WIB</option>
               <option value="17:00">17:00 WIB</option>
             </select>
@@ -304,22 +306,64 @@
       document.getElementById('max-cap-label').textContent = `Kapasitas Maks: ${room.capacity} Orang`;
 
       if (dateVal) {
-        const d = new Date(dateVal);
+        const p = dateVal.split('-').map(Number);
+        const d = (p.length === 3 && !p.some(isNaN)) ? new Date(p[0], p[1] - 1, p[2]) : new Date(dateVal);
         document.getElementById('summary-date-text').textContent = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
       }
 
-      // Check real schedule conflicts from db.schedules
-      const schedules = window.SIPRK.getSchedules();
-      const conflictSch = schedules.find(s => s.roomId === room.id && s.startTime <= startVal && s.endTime > startVal);
+      // Gunakan algoritma terpusat agar 100% identik dengan halaman Jadwal, Detail Ruangan, dan Backend
+      const check = window.SIPRK.checkSlotConflict(room.id, dateVal, startVal, endVal);
+
       const conflictBanner = document.getElementById('conflict-banner');
       const statusBadge = document.getElementById('room-status-badge');
+      const conflictTitle = document.getElementById('conflict-title-text');
+      const conflictDetail = document.getElementById('conflict-detail-text');
+      const slotBtn = document.getElementById('btn-use-empty-slot');
 
-      if (conflictSch) {
+      if (check.conflict) {
         isConflict = true;
         conflictBanner.classList.remove('hidden');
-        document.getElementById('conflict-detail-text').textContent = `Bentrok dengan kuliah rutin ${conflictSch.code} ${conflictSch.courseName} (${conflictSch.startTime} - ${conflictSch.endTime} WIB).`;
         statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF1E6] text-[#D46B1D] flex items-center gap-1';
         statusBadge.innerHTML = `<span class="material-symbols-outlined text-[14px]">warning</span><span>Bentrok Jadwal</span>`;
+
+        conflictTitle.textContent = check.title;
+        conflictDetail.innerHTML = check.detail;
+
+        // Cari slot yang benar-benar tersedia di ruangan ini pada tanggal yang dipilih
+        const freeSlots = window.SIPRK.getRoomSlotsForDate(room, dateVal).filter(sl => !sl.conflict && sl.status === 'tersedia');
+        if (freeSlots.length > 0) {
+          const suggested = freeSlots[0];
+          slotBtn.classList.remove('hidden');
+          slotBtn.textContent = `Gunakan Slot Kosong ${suggested.time} WIB`;
+          slotBtn.onclick = () => {
+            document.getElementById('input-jam-mulai').value = suggested.start;
+            document.getElementById('input-jam-selesai').value = suggested.end;
+            handleRoomOrTimeChange();
+          };
+        } else {
+          // Cari di ruangan lain yang tersedia pada tanggal ini
+          const otherRooms = window.SIPRK.getRooms().filter(r => r.status === 'tersedia' && r.id !== room.id);
+          let altFound = null;
+          for (const or of otherRooms) {
+            const orFree = window.SIPRK.getRoomSlotsForDate(or, dateVal).find(sl => !sl.conflict && sl.status === 'tersedia');
+            if (orFree) {
+              altFound = { room: or, slot: orFree };
+              break;
+            }
+          }
+          if (altFound) {
+            slotBtn.classList.remove('hidden');
+            slotBtn.textContent = `Pindah ke ${altFound.room.name} (${altFound.slot.time} WIB)`;
+            slotBtn.onclick = () => {
+              document.getElementById('select-room').value = altFound.room.id;
+              document.getElementById('input-jam-mulai').value = altFound.slot.start;
+              document.getElementById('input-jam-selesai').value = altFound.slot.end;
+              handleRoomOrTimeChange();
+            };
+          } else {
+            slotBtn.classList.add('hidden');
+          }
+        }
       } else {
         isConflict = false;
         conflictBanner.classList.add('hidden');
@@ -407,16 +451,24 @@
       const icon = document.getElementById('btn-action-icon');
       document.getElementById('btn-back-text').textContent = currentStep === 1 ? 'Batal' : 'Kembali';
 
+      if (isConflict) {
+        label.textContent = 'Jadwal Bentrok (Pilih Jam Lain)';
+        icon.textContent = 'block';
+        btn.className = 'flex-1 h-11 px-4 rounded-xl bg-[#E6E9ED] text-[#D64550] font-bold text-xs flex items-center justify-center gap-1.5 cursor-not-allowed border border-[#D64550]/30';
+        btn.disabled = true;
+        return;
+      }
+
       if (currentStep === 4) {
         label.textContent = 'Kirim Pengajuan';
         icon.textContent = 'send';
         btn.className = 'flex-1 h-11 px-4 rounded-xl bg-[#2E9E6B] hover:bg-[#238056] disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs';
-        btn.disabled = !document.getElementById('check-persetujuan').checked || isConflict;
+        btn.disabled = !document.getElementById('check-persetujuan').checked;
       } else {
         label.textContent = 'Lanjutkan';
         icon.textContent = 'arrow_forward';
         btn.className = 'flex-1 h-11 px-4 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs';
-        btn.disabled = isConflict;
+        btn.disabled = false;
       }
     }
 
@@ -453,11 +505,22 @@
         isDraft: false
       });
 
+      if (!created || created.ok === false) {
+        alert((created && created.message) || 'Pengajuan gagal dikirim karena jadwal bentrok.');
+        goToStep(1);
+        handleRoomOrTimeChange();
+        return;
+      }
+
       window.location.href = `s06-konfirmasi.html?id=${encodeURIComponent(created.id)}`;
     }
 
     async function saveAsDraft() {
-      await window.SIPRK.createBooking({
+      if (isConflict) {
+        alert('Pengajuan tidak dapat disimpan karena jadwal bentrok dengan kegiatan lain. Silakan ubah jam atau pilih ruangan lain terlebih dahulu.');
+        return;
+      }
+      const created = await window.SIPRK.createBooking({
         roomId: document.getElementById('select-room').value,
         date: document.getElementById('input-tanggal').value,
         dateFormatted: document.getElementById('summary-date-text').textContent,
@@ -471,6 +534,10 @@
         documentName: uploadedDocName,
         isDraft: true
       });
+      if (!created || created.ok === false) {
+        alert((created && created.message) || 'Draf tidak dapat disimpan karena jadwal bentrok.');
+        return;
+      }
       window.location.href = 's07-peminjaman-saya.html';
     }
 

@@ -45,10 +45,10 @@
         </div>
       </div>
       <div class="flex items-center gap-1.5">
-        <button aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-[#424751] hover:bg-[#edf4ff] transition-colors">
+        <a href="s15-notifikasi.html" aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-[#424751] hover:bg-[#edf4ff] transition-colors">
           <span class="material-symbols-outlined text-[22px]">notifications</span>
           <span id="notif-badge-count" class="hidden absolute top-1 right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#D64550] text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-white leading-none">0</span>
-        </button>
+        </a>
         <a href="s10-profil.html" id="user-avatar-link" class="w-8 h-8 rounded-full bg-[#14325C] text-white text-xs font-bold flex items-center justify-center shadow-2xs">
           RM
         </a>
@@ -150,9 +150,6 @@
     function getStatusBadgeHTML(status) {
       if (status === 'disetujui') {
         return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#D8F1E4] text-[#2E9E6B]"><span class="material-symbols-outlined text-[14px]">check_circle</span>Disetujui</span>`;
-      }
-      if (status === 'konflik') {
-        return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#FFF1E6] text-[#D46B1D]"><span class="material-symbols-outlined text-[14px]">warning</span>Konflik</span>`;
       }
       if (status === 'ditolak') {
         return `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#F9DADD] text-[#D64550]"><span class="material-symbols-outlined text-[14px]">cancel</span>Ditolak</span>`;

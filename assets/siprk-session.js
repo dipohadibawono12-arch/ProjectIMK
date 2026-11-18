@@ -46,14 +46,6 @@ window.SIPRK = (function () {
       's15-notifikasi.html',
       's10-profil.html',
       's17-error.html'
-    ],
-    fakultas: [
-      's01-login.html',
-      's13-admin-rekap.html',
-      's14-admin-dashboard.html',
-      's15-notifikasi.html',
-      's10-profil.html',
-      's17-error.html'
     ]
   };
 
@@ -112,24 +104,6 @@ window.SIPRK = (function () {
         avatar: 'PH',
         homeScreen: 's10-admin-pengajuan.html',
         badgeClass: 'bg-[#FFF0C2] text-[#C98A00]'
-      },
-      {
-        id: 'u-fak-1',
-        role: 'fakultas',
-        roleLabel: 'Pimpinan Fakultas',
-        name: 'Dr. Sari Wijaya, S.T., M.MT.',
-        shortName: 'Bu Sari',
-        email: 'dekanat@ub.ac.id',
-        idLabel: 'NIP',
-        idNumber: '197611042002122001',
-        password: 'fakultas123',
-        prodi: 'Wakil Dekan Bidang Umum & Keuangan - FILKOM UB',
-        organization: 'Pimpinan Fakultas & Sarpras UB',
-        semester: 'Periode Evaluasi 2026',
-        phone: '0812-9900-1122',
-        avatar: 'BS',
-        homeScreen: 's14-admin-dashboard.html',
-        badgeClass: 'bg-[#e3efff] text-[#14325C]'
       }
     ],
     rooms: [
@@ -315,19 +289,19 @@ window.SIPRK = (function () {
         title: 'Kelas Pengganti: Sistem Basis Data (SI-2A)',
         participants: 38,
         capacity: 50,
-        status: 'konflik',
+        status: 'ditolak',
         priority: 'Prioritas 2 • Mendesak H-0',
-        conflictNote: 'Bentrok dengan Kuliah Rutin PBO (13:00 - 14:40 WIB)',
-        rejectionReason: '',
+        conflictNote: '',
+        rejectionReason: 'Ruangan tidak dapat digunakan karena bentrok dengan jadwal Kuliah Rutin PBO (13:00 - 14:40 WIB).',
         documentName: 'RPS_Kelas_Pengganti_SBD.pdf',
         documentSize: '1.2 MB',
         createdAt: '19 Okt 2026, 09:15 WIB',
         history: [
           {
-            status: 'Konflik Jadwal Terdeteksi',
-            actor: 'Sistem Deteksi Otomatis SIPRK',
-            time: '19 Okt 2026, 09:15 WIB',
-            note: 'Slot beririsan dengan jadwal kuliah rutin PBO (13:00 - 14:40). Menunggu resolusi Admin Sarpras.'
+            status: 'Ditolak Admin Sarpras',
+            actor: 'Hadi Suryono, S.AP.',
+            time: '19 Okt 2026, 09:20 WIB',
+            note: 'Alasan: Ruangan tidak dapat digunakan karena bentrok dengan jadwal Kuliah Rutin PBO (13:00 - 14:40 WIB).'
           },
           {
             status: 'Pengajuan Dibuat',
@@ -804,20 +778,22 @@ window.SIPRK = (function () {
   async function createBooking(payload) {
     const db = getDB();
     const session = getSession();
+    const room = getRoomById(payload.roomId || 'rt-102');
+    const dateVal = payload.date || '2026-10-22';
+    const startVal = payload.startTime || '08:40';
+    const endVal = payload.endTime || '10:20';
+
+    const conflictCheck = checkSlotConflict(room.id, dateVal, startVal, endVal);
+    if (conflictCheck.conflict) {
+      return { ok: false, message: conflictCheck.plainDetail || conflictCheck.title };
+    }
+
     const seq = String(db.bookings.length + 45).padStart(4, '0');
     const code = `SIPRK-261019-${seq}`;
     const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
 
-    const room = getRoomById(payload.roomId || 'rt-102');
-
-    // Check if there is a course schedule conflict
-    const hasConflict = db.schedules.some(s =>
-      s.roomId === room.id &&
-      s.startTime <= payload.startTime &&
-      s.endTime > payload.startTime
-    );
-
-    const status = payload.isDraft ? 'draf' : (hasConflict ? 'konflik' : 'menunggu');
+    // Seluruh pengajuan baru masuk ke antrean Admin Sarpras berstatus "menunggu"
+    const status = payload.isDraft ? 'draf' : 'menunggu';
 
     const newBooking = {
       id: code,
@@ -832,30 +808,30 @@ window.SIPRK = (function () {
       roomId: room.id,
       roomName: room.name,
       roomLocation: `${room.building}, ${room.floor}`,
-      date: payload.date || '2026-10-22',
+      date: dateVal,
       dateFormatted: payload.dateFormatted || 'Kamis, 22 Okt 2026',
-      startTime: payload.startTime || '10:20',
-      endTime: payload.endTime || '12:00',
+      startTime: startVal,
+      endTime: endVal,
       category: payload.category || (session.role === 'dosen' ? 'Kelas Pengganti' : 'Kegiatan Ormawa'),
       courseInfo: payload.courseInfo || '',
       title: payload.title || 'Kegiatan Akademik UB',
       participants: Number(payload.participants) || 35,
       capacity: room.capacity,
       status: status,
-      priority: session.role === 'dosen' ? 'Prioritas 2 • Mendesak Dosen' : 'Prioritas 3 • Ormawa',
-      conflictNote: hasConflict ? 'Beririsan dengan jadwal perkuliahan reguler di ruang yang sama' : '',
+      priority: session.role === 'dosen' ? 'Prioritas 2 • Dosen' : 'Prioritas 3 • Ormawa',
+      conflictNote: '',
       rejectionReason: '',
       documentName: payload.documentName || 'Berkas_Pendukung_SIPRK.pdf',
       documentSize: '1.8 MB',
       createdAt: `19 Okt 2026, ${nowStr}`,
       history: [
         {
-          status: status === 'draf' ? 'Draf Tersimpan' : (status === 'konflik' ? 'Konflik Jadwal Terdeteksi' : 'Menunggu Verifikasi Sarpras'),
+          status: status === 'draf' ? 'Draf Tersimpan' : 'Menunggu Verifikasi Sarpras',
           actor: session.name,
           time: `19 Okt 2026, ${nowStr}`,
           note: status === 'draf'
             ? 'Draf pengajuan disimpan oleh pemohon.'
-            : 'Pengajuan berhasil dikirim melalui aplikasi mobile SIPRK UB.'
+            : 'Pengajuan berhasil dikirim dan otomatis masuk ke antrean Admin Sarpras.'
         }
       ]
     };
@@ -867,11 +843,11 @@ window.SIPRK = (function () {
         id: 'notif-' + Date.now(),
         targetRole: 'admin',
         unread: true,
-        type: status === 'konflik' ? 'conflict' : 'warning',
-        icon: status === 'konflik' ? 'warning' : 'inbox',
-        color: status === 'konflik' ? 'bg-[#FFF1E6] text-[#D46B1D]' : 'bg-[#FFF0C2] text-[#C98A00]',
+        type: 'warning',
+        icon: 'inbox',
+        color: 'bg-[#FFF0C2] text-[#C98A00]',
         title: `Pengajuan Baru: ${newBooking.code}`,
-        body: `${newBooking.applicantName} mengajukan ${newBooking.roomName} untuk "${newBooking.title}" (${newBooking.dateFormatted}).`,
+        body: `${newBooking.applicantName} (${session.roleLabel}) mengajukan ${newBooking.roomName} untuk "${newBooking.title}" (${newBooking.dateFormatted}).`,
         time: 'Baru saja',
         bookingId: newBooking.id,
         link: 's10-admin-pengajuan.html'
@@ -935,6 +911,8 @@ window.SIPRK = (function () {
         link: `s08-detail-peminjaman.html?id=${booking.id}`
       });
     } else if (updates.status === 'ditolak') {
+      if (updates.rejectionReason) booking.rejectionReason = updates.rejectionReason;
+      if (updates.rejectReason) booking.rejectionReason = updates.rejectReason;
       db.notifications.unshift({
         id: 'notif-' + Date.now(),
         targetRole: booking.userRole,
@@ -943,7 +921,7 @@ window.SIPRK = (function () {
         icon: 'cancel',
         color: 'bg-[#F9DADD] text-[#D64550]',
         title: `Pengajuan ${booking.code} Ditolak`,
-        body: `Alasan: ${booking.rejectionReason || 'Permohonan tidak disetujui oleh Admin Sarpras.'}`,
+        body: `Alasan penolakan: ${booking.rejectionReason || 'Ruangan tidak dapat digunakan pada waktu tersebut.'}`,
         time: 'Baru saja',
         bookingId: booking.id,
         link: `s08-detail-peminjaman.html?id=${booking.id}`
@@ -962,6 +940,158 @@ window.SIPRK = (function () {
     await apiCall('/api/bookings/' + encodeURIComponent(id), 'DELETE');
   }
 
+  const BASE_SLOTS = [
+    { time: '07:00 - 08:40', start: '07:00', end: '08:40' },
+    { time: '08:40 - 10:20', start: '08:40', end: '10:20' },
+    { time: '10:20 - 12:00', start: '10:20', end: '12:00' },
+    { time: '13:00 - 14:40', start: '13:00', end: '14:40' },
+    { time: '15:00 - 17:00', start: '15:00', end: '17:00' }
+  ];
+
+  function getDayNameFromDate(dateStr) {
+    if (!dateStr) return 'Kamis';
+    const parts = String(dateStr).split('-').map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return 'Kamis';
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    return days[d.getDay()] || 'Kamis';
+  }
+
+  function formatShortLabel(text, maxWords = 3) {
+    const cleaned = String(text || '').trim().replace(/\s+/g, ' ');
+    if (!cleaned) return 'Sedang Terpakai';
+    const words = cleaned.split(' ').slice(0, maxWords).map(w => w.replace(/[:;]+$/, ''));
+    if (words.length > 0) {
+      words[words.length - 1] = words[words.length - 1].replace(/[,.\-]+$/, '');
+    }
+    return words.filter(Boolean).join(' ') || 'Sedang Terpakai';
+  }
+
+  function timesOverlap(startA, endA, startB, endB) {
+    return String(startA) < String(endB) && String(endA) > String(startB);
+  }
+
+  function checkSlotConflict(roomId, dateStr, startTime, endTime) {
+    if (!startTime || !endTime || String(startTime) >= String(endTime)) {
+      return {
+        conflict: true,
+        type: 'invalid_time',
+        status: 'terpakai',
+        title: 'Rentang Waktu Tidak Valid',
+        detail: 'Jam selesai harus lebih besar dari jam mulai.',
+        plainDetail: 'Jam selesai harus lebih besar dari jam mulai.',
+        shortLabel: 'Jam Tidak Valid'
+      };
+    }
+
+    const db = getDB();
+    const room = (db.rooms || []).find(r => r.id === roomId || r.code === roomId || r.name === roomId) || getRoomById(roomId);
+    if (!room) {
+      return { conflict: false, type: null, status: 'tersedia', title: 'Bebas Bentrok', detail: '', plainDetail: '', shortLabel: 'Tersedia' };
+    }
+
+    if (room.status === 'maintenance') {
+      const note = room.maintenanceNote || 'Ruangan sedang dalam pemeliharaan sarpras.';
+      return {
+        conflict: true,
+        type: 'maintenance',
+        status: 'maintenance',
+        title: 'Ruangan Sedang Maintenance',
+        detail: note,
+        plainDetail: note,
+        shortLabel: formatShortLabel(note, 3)
+      };
+    }
+
+    const bkg = (db.bookings || []).find(b =>
+      b.roomId === room.id &&
+      (b.status === 'disetujui' || b.status === 'menunggu') &&
+      b.date === dateStr &&
+      timesOverlap(b.startTime, b.endTime, startTime, endTime)
+    );
+    if (bkg) {
+      return {
+        conflict: true,
+        type: 'booking',
+        status: 'terpakai',
+        title: 'Ruangan Sudah Dipinjam Kegiatan Lain',
+        detail: `Ruangan telah dipinjam untuk <strong>${bkg.title}</strong> oleh <strong>${bkg.applicantName}</strong> (${bkg.startTime} - ${bkg.endTime} WIB).`,
+        plainDetail: `Ruangan telah dipinjam untuk "${bkg.title}" oleh ${bkg.applicantName} (${bkg.startTime} - ${bkg.endTime} WIB).`,
+        shortLabel: formatShortLabel(bkg.title, 3),
+        booking: bkg
+      };
+    }
+
+    const dayName = getDayNameFromDate(dateStr);
+    const sch = (db.schedules || []).find(s =>
+      s.roomId === room.id &&
+      s.status !== 'nonaktif' &&
+      s.day === dayName &&
+      timesOverlap(s.startTime, s.endTime, startTime, endTime)
+    );
+    if (sch) {
+      const code = sch.code || sch.courseCode || 'Kuliah';
+      return {
+        conflict: true,
+        type: 'schedule',
+        status: 'terpakai',
+        title: 'Jadwal Beririsan dengan Kuliah Reguler',
+        detail: `Bentrok dengan kuliah rutin <strong>${code} ${sch.courseName}</strong> (${sch.startTime} - ${sch.endTime} WIB).`,
+        plainDetail: `Bentrok dengan kuliah rutin ${code} ${sch.courseName} (${sch.startTime} - ${sch.endTime} WIB).`,
+        shortLabel: formatShortLabel(`Kuliah ${sch.courseName}`, 3),
+        schedule: sch
+      };
+    }
+
+    const defaultSlot = (room.slots || []).find(sl => {
+      if (!['terpakai', 'menunggu', 'maintenance'].includes(sl.status)) return false;
+      const parts = String(sl.time || '').split(' - ').map(t => t.trim());
+      if (parts.length !== 2) return false;
+      return timesOverlap(parts[0], parts[1], startTime, endTime);
+    });
+    if (defaultSlot) {
+      return {
+        conflict: true,
+        type: 'default_slot',
+        status: defaultSlot.status === 'maintenance' ? 'maintenance' : 'terpakai',
+        title: defaultSlot.status === 'menunggu' ? 'Slot Sedang Dalam Antrean Pengajuan' : 'Slot Waktu Sudah Terisi Jadwal Tetap',
+        detail: `Slot waktu ${defaultSlot.time} WIB sudah terisi untuk <strong>${defaultSlot.label || 'Kegiatan Terjadwal'}</strong>.`,
+        plainDetail: `Slot waktu ${defaultSlot.time} WIB sudah terisi untuk ${defaultSlot.label || 'Kegiatan Terjadwal'}.`,
+        shortLabel: formatShortLabel(defaultSlot.label || 'Sudah Terisi', 3),
+        slot: defaultSlot
+      };
+    }
+
+    return {
+      conflict: false,
+      type: null,
+      status: 'tersedia',
+      title: 'Bebas Bentrok',
+      detail: '',
+      plainDetail: '',
+      shortLabel: 'Tersedia'
+    };
+  }
+
+  function getRoomSlotsForDate(roomOrId, dateStr) {
+    const room = typeof roomOrId === 'string' ? getRoomById(roomOrId) : roomOrId;
+    if (!room) return [];
+    return BASE_SLOTS.map(bs => {
+      const check = checkSlotConflict(room.id, dateStr, bs.start, bs.end);
+      return {
+        time: bs.time,
+        start: bs.start,
+        end: bs.end,
+        status: check.status,
+        conflict: check.conflict,
+        type: check.type,
+        label: check.shortLabel,
+        shortLabel: check.shortLabel,
+        fullDetail: check.plainDetail || check.detail
+      };
+    });
+  }
+
   function getSchedules() {
     return getDB().schedules;
   }
@@ -971,7 +1101,7 @@ window.SIPRK = (function () {
     const room = getRoomById(schData.roomId || 'rt-102');
     const newSch = {
       id: 'sch-' + Date.now(),
-      code: schData.code || 'IF-2104',
+      code: schData.code || schData.courseCode || 'IF-2104',
       courseName: schData.courseName || 'Arsitektur Komputer',
       roomId: room.id,
       roomName: `${room.name} (${room.buildingShort})`,
@@ -1029,8 +1159,9 @@ window.SIPRK = (function () {
       building: 'Gedung Kuliah Bersama A • Lt. 1',
       capacity: 45,
       date: '2026-10-22',
-      startTime: '10:20',
-      endTime: '12:00'
+      dateFormatted: 'Kamis, 22 Okt 2026',
+      startTime: '08:40',
+      endTime: '10:20'
     };
   }
 
@@ -1041,7 +1172,7 @@ window.SIPRK = (function () {
     if (!navEl) return;
 
     const db = getDB();
-    const pendingCount = db.bookings.filter(b => b.status === 'menunggu' || b.status === 'konflik').length;
+    const pendingCount = db.bookings.filter(b => b.status === 'menunggu' || b.status === 'pending').length;
 
     let tabs = [];
     if (role === 'mahasiswa') {
@@ -1066,13 +1197,6 @@ window.SIPRK = (function () {
         { file: 's11-admin-ruangan.html', label: 'Ruangan', icon: 'meeting_room' },
         { file: 's12-admin-jadwal.html', label: 'Jadwal CSV', icon: 'edit_calendar' },
         { file: 's13-admin-rekap.html', label: 'Rekap', icon: 'fact_check' }
-      ];
-    } else if (role === 'fakultas') {
-      tabs = [
-        { file: 's14-admin-dashboard.html', label: 'Evaluasi', icon: 'monitoring' },
-        { file: 's13-admin-rekap.html', label: 'Laporan', icon: 'summarize' },
-        { file: 's15-notifikasi.html', label: 'Notifikasi', icon: 'notifications' },
-        { file: 's10-profil.html', label: 'Profil', icon: 'account_circle' }
       ];
     }
 
@@ -1118,6 +1242,11 @@ window.SIPRK = (function () {
     getNotifications,
     markAllNotificationsRead,
     setSelectedSlot,
-    getSelectedSlot
+    getSelectedSlot,
+    BASE_SLOTS,
+    getDayNameFromDate,
+    formatShortLabel,
+    checkSlotConflict,
+    getRoomSlotsForDate
   };
 })();

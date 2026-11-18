@@ -117,8 +117,8 @@
       }
 
       list.innerHTML = currentRekapItems.map((item, idx) => {
-        const statusLabel = item.status === 'disetujui' ? 'Disetujui' : item.status === 'pending' ? 'Pending' : item.status === 'konflik' ? 'Konflik' : 'Ditolak';
-        const statusColor = item.status === 'disetujui' ? 'bg-[#D8F1E4] text-[#2E9E6B]' : item.status === 'pending' ? 'bg-[#FFF0C2] text-[#8C6000]' : 'bg-[#F9DADD] text-[#D64550]';
+        const statusLabel = item.status === 'disetujui' ? 'Disetujui' : (item.status === 'ditolak' ? 'Ditolak' : 'Menunggu');
+        const statusColor = item.status === 'disetujui' ? 'bg-[#D8F1E4] text-[#2E9E6B]' : (item.status === 'ditolak' ? 'bg-[#F9DADD] text-[#D64550]' : 'bg-[#FFF0C2] text-[#8C6000]');
         return `
           <article onclick="openPicDetail(${idx})" class="bg-white rounded-xl border border-[#E6E9ED] p-3.5 shadow-2xs hover:border-[#1F5FA8] cursor-pointer space-y-2">
             <div class="flex items-start justify-between gap-2">

@@ -60,7 +60,7 @@
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-lg font-extrabold text-[#14325C] leading-tight">Tinjauan Pengajuan Masuk</h1>
-          <p class="text-[11px] text-[#6B7785]">Prioritas: Konflik &amp; Mendesak di urutan teratas (ADM-01)</p>
+          <p class="text-[11px] text-[#6B7785]">Kelola permohonan peminjaman ruangan dari Dosen dan Mahasiswa</p>
         </div>
         <button onclick="toggleBulkMode()" id="btn-bulk-toggle" type="button" class="px-2.5 py-1.5 rounded-lg border border-[#1F5FA8] text-[#1F5FA8] text-[11px] font-semibold hover:bg-[#DCEBFA]/40 flex items-center gap-1">
           <span class="material-symbols-outlined text-[15px]">done_all</span>
@@ -74,19 +74,15 @@
         <input id="admin-search" oninput="renderSubmissions()" type="text" placeholder="Cari kegiatan, pemohon, atau ruangan..." class="w-full h-10 pl-9 pr-3 rounded-lg border border-[#c2c6d3] bg-[#F5F7FA] text-xs text-[#1B2733] focus:bg-white focus:ring-2 focus:ring-[#1F5FA8]"/>
       </div>
 
-      <!-- Status Filter Tabs (ADM-01) -->
+      <!-- Status Filter Tabs -->
       <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
         <button onclick="setAdminTab('all')" id="adm-tab-all" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white shrink-0 flex items-center gap-1">
           <span>Semua</span>
           <span class="px-1.5 py-0.2 rounded-full bg-white/20 text-[10px]">6</span>
         </button>
         <button onclick="setAdminTab('pending')" id="adm-tab-pending" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED] shrink-0 flex items-center gap-1">
-          <span>Pending</span>
-          <span class="px-1.5 py-0.2 rounded-full bg-[#FFF0C2] text-[#8C6000] text-[10px] font-bold">3</span>
-        </button>
-        <button onclick="setAdminTab('konflik')" id="adm-tab-konflik" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED] shrink-0 flex items-center gap-1">
-          <span>Konflik</span>
-          <span class="px-1.5 py-0.2 rounded-full bg-[#FFF1E6] text-[#D46B1D] text-[10px] font-bold">1</span>
+          <span>Menunggu Verifikasi</span>
+          <span class="px-1.5 py-0.2 rounded-full bg-[#FFF0C2] text-[#8C6000] text-[10px] font-bold">4</span>
         </button>
         <button onclick="setAdminTab('disetujui')" id="adm-tab-disetujui" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED] shrink-0">
           Disetujui (1)
@@ -97,9 +93,9 @@
       </div>
     </div>
 
-    <!-- Bulk Action Bar (ADM-06) -->
+    <!-- Bulk Action Bar -->
     <div id="bulk-action-bar" class="hidden bg-[#DCEBFA] border-b border-[#1F5FA8]/30 px-4 py-2.5 flex items-center justify-between">
-      <span class="text-xs font-semibold text-[#14325C]">Pilih item bebas konflik untuk disetujui:</span>
+      <span class="text-xs font-semibold text-[#14325C]">Pilih pengajuan untuk disetujui sekaligus:</span>
       <button onclick="executeBulkApprove()" type="button" class="px-3 py-1.5 rounded-lg bg-[#2E9E6B] text-white text-xs font-bold shadow-xs">
         Setujui Terpilih
       </button>
@@ -136,43 +132,17 @@
 
         <!-- Scrollable Sheet Body -->
         <div class="p-4 overflow-y-auto space-y-4 text-xs flex-1">
-          <!-- Submitter & Priority Info -->
+          <!-- Detail Info Pengajuan -->
           <div class="bg-[#F5F7FA] p-3 rounded-xl border border-[#E6E9ED] space-y-1.5">
             <div class="flex items-center justify-between">
               <span id="sheet-applicant" class="font-bold text-[#14325C]">Dr. Rina Kusuma (Dosen)</span>
-              <span id="sheet-priority-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF0C2] text-[#8C6000]">Prioritas 2: Kelas Pengganti</span>
+              <span id="sheet-priority-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF0C2] text-[#8C6000]">Prioritas 2: Dosen</span>
             </div>
             <p id="sheet-room-time" class="text-[#424751] flex items-center gap-1">
               <span class="material-symbols-outlined text-[15px] text-[#1F5FA8]">meeting_room</span>
               <span>Ruang 2.1 (GKB-A) • 20 Okt • 13:00 - 14:40 WIB</span>
             </p>
             <p id="sheet-participants" class="text-[#6B7785]">Peserta: 38 orang (Kapasitas maks: 45 kursi)</p>
-          </div>
-
-          <!-- Conflict Warning & Resolution Box (ADM-03) -->
-          <div id="sheet-conflict-box" class="bg-[#FFF1E6] border-l-4 border-[#F2A35E] p-3.5 rounded-r-xl space-y-2.5">
-            <div class="flex items-start gap-2">
-              <span class="material-symbols-outlined text-[#D64550] text-[20px] shrink-0">warning</span>
-              <div>
-                <h3 class="font-bold text-[#8C3F08]">Terdeteksi Konflik Jadwal (ADM-03)</h3>
-                <p class="text-[11px] text-[#1B2733] mt-0.5">
-                  Bentrok dengan: <strong>Kuliah Rutin PBO (13:00 – 14:40 WIB)</strong> — Prioritas 1 (BR-03).
-                </p>
-              </div>
-            </div>
-            <div>
-              <span class="text-[11px] font-bold text-[#14325C] block mb-1.5">Solusi Konflik (Wajib pilih sebelum Setujui):</span>
-              <div class="grid grid-cols-2 gap-2">
-                <button onclick="resolveConflictAction('ruang')" type="button" class="py-2 px-2.5 rounded-lg bg-white border border-[#1F5FA8] text-[#1F5FA8] font-semibold text-[11px] hover:bg-[#DCEBFA]/40 flex items-center justify-center gap-1">
-                  <span class="material-symbols-outlined text-[15px]">swap_horiz</span>
-                  <span>Pindah Ruang 2.2</span>
-                </button>
-                <button onclick="resolveConflictAction('jam')" type="button" class="py-2 px-2.5 rounded-lg bg-white border border-[#1F5FA8] text-[#1F5FA8] font-semibold text-[11px] hover:bg-[#DCEBFA]/40 flex items-center justify-center gap-1">
-                  <span class="material-symbols-outlined text-[15px]">schedule</span>
-                  <span>Ganti Jam 15:00</span>
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Document Completeness Checklist (ADM-04) -->
@@ -237,14 +207,11 @@
               <span class="material-symbols-outlined text-[18px]">close</span>
               <span>Tolak Pengajuan</span>
             </button>
-            <button id="btn-approve-submission" onclick="handleApproveSubmission()" type="button" class="h-11 rounded-xl bg-[#2E9E6B] hover:bg-[#238056] disabled:bg-[#E6E9ED] disabled:text-[#6B7785] disabled:cursor-not-allowed text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs">
+            <button id="btn-approve-submission" onclick="handleApproveSubmission()" type="button" class="h-11 rounded-xl bg-[#2E9E6B] hover:bg-[#238056] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs">
               <span class="material-symbols-outlined text-[18px]">check_circle</span>
               <span>Setujui</span>
             </button>
           </div>
-          <p id="approve-disabled-hint" class="hidden text-center text-[10px] text-[#D46B1D] font-semibold">
-            * Tombol Setujui nonaktif sampai konflik jadwal diselesaikan (ADM-03)
-          </p>
         </div>
       </div>
     </div>
@@ -272,14 +239,12 @@
     function updateTabCounts(all) {
       const counts = {
         all: all.length,
-        pending: all.filter(x => x.status === 'pending').length,
-        konflik: all.filter(x => x.status === 'konflik').length,
+        pending: all.filter(x => x.status === 'menunggu' || x.status === 'pending').length,
         disetujui: all.filter(x => x.status === 'disetujui').length,
         ditolak: all.filter(x => x.status === 'ditolak').length
       };
       document.getElementById('adm-tab-all').innerHTML = `<span>Semua</span><span class="px-1.5 py-0.2 rounded-full bg-white/20 text-[10px]">${counts.all}</span>`;
-      document.getElementById('adm-tab-pending').innerHTML = `<span>Pending</span><span class="px-1.5 py-0.2 rounded-full bg-[#FFF0C2] text-[#8C6000] text-[10px] font-bold">${counts.pending}</span>`;
-      document.getElementById('adm-tab-konflik').innerHTML = `<span>Konflik</span><span class="px-1.5 py-0.2 rounded-full bg-[#FFF1E6] text-[#D46B1D] text-[10px] font-bold">${counts.konflik}</span>`;
+      document.getElementById('adm-tab-pending').innerHTML = `<span>Menunggu</span><span class="px-1.5 py-0.2 rounded-full bg-[#FFF0C2] text-[#8C6000] text-[10px] font-bold">${counts.pending}</span>`;
       document.getElementById('adm-tab-disetujui').textContent = `Disetujui (${counts.disetujui})`;
       document.getElementById('adm-tab-ditolak').textContent = `Ditolak (${counts.ditolak})`;
     }
@@ -292,7 +257,8 @@
       const cont = document.getElementById('submissions-container');
 
       const filtered = submissionsData.filter(item => {
-        const matchTab = (activeTab === 'all') || (item.status === activeTab);
+        const itemStatus = (item.status === 'menunggu') ? 'pending' : item.status;
+        const matchTab = (activeTab === 'all') || (itemStatus === activeTab);
         const matchQuery = !q ||
           (item.title || '').toLowerCase().includes(q) ||
           (item.applicantName || '').toLowerCase().includes(q) ||
@@ -315,18 +281,17 @@
       cont.innerHTML = filtered.map(item => {
         let statusBadge = '';
         let borderClass = 'border border-[#E6E9ED]';
-        if (item.status === 'konflik') {
-          statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF1E6] text-[#D46B1D] border border-[#F2A35E] flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">warning</span>Konflik</span>`;
-          borderClass = 'border-2 border-[#D64550] bg-[#FFF8F6]';
-        } else if (item.status === 'pending') {
-          statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF0C2] text-[#8C6000] flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">schedule</span>Pending</span>`;
-        } else if (item.status === 'disetujui') {
+        const st = (item.status === 'menunggu') ? 'pending' : item.status;
+
+        if (st === 'pending') {
+          statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF0C2] text-[#8C6000] flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">schedule</span>Menunggu</span>`;
+        } else if (st === 'disetujui') {
           statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D8F1E4] text-[#2E9E6B] flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">check_circle</span>Disetujui</span>`;
         } else {
           statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F9DADD] text-[#D64550] flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">cancel</span>Ditolak</span>`;
         }
 
-        const canBulkSelect = isBulkMode && item.status === 'pending';
+        const canBulkSelect = isBulkMode && st === 'pending';
 
         return `
           <article onclick="openReviewSheet('${item.id}')" class="bg-white rounded-xl ${borderClass} p-3.5 shadow-2xs hover:border-[#1F5FA8] transition-all cursor-pointer">
@@ -336,21 +301,21 @@
                 <div>
                   <div class="flex items-center gap-1.5">
                     <span class="text-[10px] font-mono font-bold text-[#6B7785]">${item.id}</span>
-                    <span class="text-[10px] px-1.5 py-0.2 rounded bg-[#edf4ff] text-[#1F5FA8] font-semibold">${item.priorityLabel || 'Prioritas 3 • Umum'}</span>
+                    <span class="text-[10px] px-1.5 py-0.2 rounded bg-[#edf4ff] text-[#1F5FA8] font-semibold">${item.priority || item.priorityLabel || 'Prioritas 3 • Umum'}</span>
                   </div>
                   <h3 class="text-xs font-bold text-[#14325C] mt-1">${item.title}</h3>
-                  <p class="text-[11px] text-[#424751] mt-0.5">${item.applicantName} (${item.unit || '-'})</p>
+                  <p class="text-[11px] text-[#424751] mt-0.5">${item.applicantName} (${item.applicantUnit || item.unit || '-'})</p>
                 </div>
               </div>
               ${statusBadge}
             </div>
             <div class="mt-2.5 pt-2 border-t border-[#E6E9ED] flex items-center justify-between text-[11px] text-[#6B7785]">
-              <span class="font-medium text-[#1B2733]">${item.roomName} • ${item.dateLabel} (${item.startTime} - ${item.endTime})</span>
+              <span class="font-medium text-[#1B2733]">${item.roomName} • ${item.dateFormatted || item.dateLabel || item.date} (${item.startTime} - ${item.endTime})</span>
               <span class="text-[#1F5FA8] font-semibold flex items-center">Tinjau <span class="material-symbols-outlined text-[15px]">chevron_right</span></span>
             </div>
-            ${item.conflictNote && item.status === 'konflik' ? `
-              <div class="mt-2 px-2.5 py-1.5 rounded-lg bg-[#FFF1E6] border-l-4 border-[#F2A35E] text-[11px] font-semibold text-[#8C3F08]">
-                ⚠️ ${item.conflictNote}
+            ${item.status === 'ditolak' && (item.rejectionReason || item.rejectReason) ? `
+              <div class="mt-2 px-2.5 py-1.5 rounded-lg bg-[#F9DADD] text-[11px] text-[#93000a] leading-tight">
+                <strong>Alasan Penolakan:</strong> ${item.rejectionReason || item.rejectReason}
               </div>
             ` : ''}
           </article>
@@ -360,8 +325,9 @@
 
     function setAdminTab(tab) {
       activeTab = tab;
-      ['all', 'pending', 'konflik', 'disetujui', 'ditolak'].forEach(t => {
+      ['all', 'pending', 'disetujui', 'ditolak'].forEach(t => {
         const el = document.getElementById('adm-tab-' + t);
+        if (!el) return;
         if (t === tab) {
           el.className = 'px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white shrink-0 flex items-center gap-1';
         } else {
@@ -381,7 +347,7 @@
     async function executeBulkApprove() {
       const checks = document.querySelectorAll('.bulk-check:checked');
       if (checks.length === 0) {
-        showToast('Pilih minimal 1 pengajuan bebas konflik terlebih dahulu');
+        showToast('Pilih minimal 1 pengajuan terlebih dahulu');
         return;
       }
       for (const c of checks) {
@@ -400,55 +366,20 @@
 
       document.getElementById('sheet-code').textContent = item.id;
       document.getElementById('sheet-title').textContent = item.title;
-      document.getElementById('sheet-applicant').textContent = `${item.applicantName} (${item.unit || '-'})`;
-      document.getElementById('sheet-priority-badge').textContent = item.priorityLabel || 'Prioritas 3';
-      document.getElementById('sheet-room-time').innerHTML = `<span class="material-symbols-outlined text-[15px] text-[#1F5FA8]">meeting_room</span><span>${item.roomName} (${item.building}) • ${item.dateLabel} • ${item.startTime} - ${item.endTime} WIB</span>`;
+      document.getElementById('sheet-applicant').textContent = `${item.applicantName} (${item.applicantUnit || item.unit || '-'})`;
+      document.getElementById('sheet-priority-badge').textContent = item.priority || item.priorityLabel || 'Prioritas';
+      document.getElementById('sheet-room-time').innerHTML = `<span class="material-symbols-outlined text-[15px] text-[#1F5FA8]">meeting_room</span><span>${item.roomName} (${item.roomLocation || item.building || 'GKB'}) • ${item.dateFormatted || item.dateLabel || item.date} • ${item.startTime} - ${item.endTime} WIB</span>`;
       document.getElementById('sheet-participants').textContent = `Peserta: ${item.participants} orang`;
       document.getElementById('chk-doc-sign').checked = item.docComplete !== false;
-      document.getElementById('reject-reason-input').value = item.rejectReason || '';
+      document.getElementById('reject-reason-input').value = item.rejectionReason || item.rejectReason || '';
       document.getElementById('reject-error-msg').classList.add('hidden');
-      updateCharCounter(item.rejectReason || '');
-
-      const conflictBox = document.getElementById('sheet-conflict-box');
-      const approveBtn = document.getElementById('btn-approve-submission');
-      const disabledHint = document.getElementById('approve-disabled-hint');
-
-      if (item.status === 'konflik') {
-        conflictBox.classList.remove('hidden');
-        approveBtn.disabled = true;
-        disabledHint.classList.remove('hidden');
-      } else {
-        conflictBox.classList.add('hidden');
-        approveBtn.disabled = false;
-        disabledHint.classList.add('hidden');
-      }
+      updateCharCounter(item.rejectionReason || item.rejectReason || '');
 
       document.getElementById('detail-review-sheet').classList.remove('hidden');
     }
 
     function closeReviewSheet() {
       document.getElementById('detail-review-sheet').classList.add('hidden');
-    }
-
-    async function resolveConflictAction(mode) {
-      const item = window.SIPRK.getBookingById(activeItemId);
-      if (!item) return;
-      const updates = { status: 'pending', conflictNote: '' };
-      if (mode === 'ruang') {
-        updates.roomId = 'r5';
-        updates.roomCode = 'RT-202';
-        updates.roomName = 'Ruang Diskusi 2.2';
-      } else {
-        updates.startTime = '15:00';
-        updates.endTime = '16:40';
-      }
-      const updated = await window.SIPRK.updateBooking(activeItemId, updates);
-      document.getElementById('sheet-conflict-box').classList.add('hidden');
-      document.getElementById('btn-approve-submission').disabled = false;
-      document.getElementById('approve-disabled-hint').classList.add('hidden');
-      document.getElementById('sheet-room-time').innerHTML = `<span class="material-symbols-outlined text-[15px] text-[#2E9E6B]">check_circle</span><span class="font-bold text-[#2E9E6B]">${updated.roomName} • ${updated.dateLabel} • ${updated.startTime} - ${updated.endTime} WIB (Bebas Bentrok)</span>`;
-      renderSubmissions();
-      showToast('Konflik jadwal diselesaikan! Tombol Setujui kini aktif.');
     }
 
     function updateCharCounter(val) {
@@ -460,7 +391,7 @@
 
     async function handleApproveSubmission() {
       const item = window.SIPRK.getBookingById(activeItemId);
-      if (!item || item.status === 'konflik') return;
+      if (!item) return;
       await window.SIPRK.updateBooking(activeItemId, { status: 'disetujui' });
       closeReviewSheet();
       renderSubmissions();
@@ -473,8 +404,8 @@
         document.getElementById('reject-error-msg').classList.remove('hidden');
         return;
       }
-      if (!confirm('Tolak pengajuan peminjaman ini? Pemohon akan menerima notifikasi beserta alasan penolakan.')) return;
-      await window.SIPRK.updateBooking(activeItemId, { status: 'ditolak', rejectReason: reason });
+      if (!confirm('Tolak pengajuan peminjaman ini? Pemohon akan menerima notifikasi beserta alasan kenapa ruangan tidak dapat digunakan.')) return;
+      await window.SIPRK.updateBooking(activeItemId, { status: 'ditolak', rejectionReason: reason });
       closeReviewSheet();
       renderSubmissions();
       showToast(`Pengajuan ${activeItemId} ditolak dengan alasan tercatat.`);

@@ -39,9 +39,9 @@
           <span class="text-[10px] text-[#6B7785] block mt-0.5">Universitas Brawijaya</span>
         </div>
       </div>
-      <button aria-label="Notifikasi" class="w-9 h-9 rounded-full flex items-center justify-center text-[#424751] hover:bg-[#edf4ff]">
+      <a href="s15-notifikasi.html" aria-label="Notifikasi" class="w-9 h-9 rounded-full flex items-center justify-center text-[#424751] hover:bg-[#edf4ff]">
         <span class="material-symbols-outlined text-[22px]">notifications</span>
-      </button>
+      </a>
     </header>
 
     <!-- Main Content -->
@@ -69,7 +69,7 @@
       <div class="flex items-center gap-1.5">
         <button onclick="setDosenFilter('all')" id="dfilt-all" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white">Semua</button>
         <button onclick="setDosenFilter('disetujui')" id="dfilt-disetujui" class="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E6E9ED] text-[#424751]">Disetujui</button>
-        <button onclick="setDosenFilter('menunggu')" id="dfilt-menunggu" class="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E6E9ED] text-[#424751]">Menunggu / Konflik</button>
+        <button onclick="setDosenFilter('menunggu')" id="dfilt-menunggu" class="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E6E9ED] text-[#424751]">Menunggu</button>
       </div>
 
       <!-- Dosen Schedule Cards List -->
@@ -114,7 +114,7 @@
       const filtered = bookings.filter(b => {
         if (dFilter === 'all') return true;
         if (dFilter === 'disetujui') return b.status === 'disetujui';
-        return b.status === 'menunggu' || b.status === 'konflik';
+        return b.status === 'menunggu';
       });
 
       const cont = document.getElementById('dosen-bookings-list');
@@ -127,7 +127,7 @@
         <article class="bg-white border border-[#E6E9ED] rounded-2xl p-4 shadow-2xs space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="px-2 py-0.5 rounded bg-[#edf4ff] text-[#1F5FA8] text-[10px] font-bold">${b.category}</span>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${b.status === 'disetujui' ? 'bg-[#D8F1E4] text-[#2E9E6B]' : (b.status === 'konflik' ? 'bg-[#FFF1E6] text-[#D46B1D]' : 'bg-[#FFF0C2] text-[#8C6000]')}">${b.status.toUpperCase()}</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${b.status === 'disetujui' ? 'bg-[#D8F1E4] text-[#2E9E6B]' : (b.status === 'ditolak' ? 'bg-[#F9DADD] text-[#D64550]' : 'bg-[#FFF0C2] text-[#8C6000]')}">${b.status.toUpperCase()}</span>
           </div>
           <h2 class="text-sm font-extrabold text-[#14325C]">${b.title}</h2>
           <div class="text-xs text-[#424751] space-y-1">

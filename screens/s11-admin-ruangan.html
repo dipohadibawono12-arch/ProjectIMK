@@ -183,7 +183,7 @@
 
     function getActiveBookingsForRoom(roomId) {
       const bookings = window.SIPRK ? window.SIPRK.getBookings() : [];
-      return bookings.filter(b => b.roomId === roomId && (b.status === 'pending' || b.status === 'disetujui' || b.status === 'konflik'));
+      return bookings.filter(b => b.roomId === roomId && (b.status === 'pending' || b.status === 'menunggu' || b.status === 'disetujui'));
     }
 
     function renderRooms() {

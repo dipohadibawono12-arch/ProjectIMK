@@ -255,10 +255,9 @@
 
   <script>
     function renderDashboardKPIs() {
-      const bookings = (window.SIPRK ? window.SIPRK.getBookings() : []).filter(b => b.status !== 'draft');
+      const bookings = (window.SIPRK ? window.SIPRK.getBookings() : []).filter(b => b.status !== 'draft' && b.status !== 'draf');
       const total = bookings.length;
       const approved = bookings.filter(b => b.status === 'disetujui').length;
-      const conflicts = bookings.filter(b => b.status === 'konflik').length;
       const appPct = total > 0 ? Math.round((approved / total) * 100) : 80;
 
       const period = document.getElementById('period-select').value;
@@ -267,13 +266,13 @@
         document.getElementById('donut-total').textContent = (total + 1120).toLocaleString('id-ID');
         document.getElementById('kpi-occ').textContent = '74%';
         document.getElementById('kpi-app').textContent = '86%';
-        document.getElementById('kpi-conf').textContent = String(conflicts + 38);
+        document.getElementById('kpi-conf').textContent = '0';
       } else {
         document.getElementById('kpi-total').textContent = String(total + 240);
         document.getElementById('donut-total').textContent = String(total + 240);
         document.getElementById('kpi-occ').textContent = '68%';
         document.getElementById('kpi-app').textContent = `${appPct}%`;
-        document.getElementById('kpi-conf').textContent = String(conflicts + 13);
+        document.getElementById('kpi-conf').textContent = '0';
       }
     }
 

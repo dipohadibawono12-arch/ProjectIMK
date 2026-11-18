@@ -42,9 +42,9 @@
         </div>
       </div>
       <div class="flex items-center gap-1">
-        <button aria-label="Notifikasi" class="relative p-2 text-[#424751] hover:bg-[#edf4ff] rounded-full transition-colors">
+        <a href="s15-notifikasi.html" aria-label="Notifikasi" class="relative p-2 text-[#424751] hover:bg-[#edf4ff] rounded-full transition-colors">
           <span class="material-symbols-outlined text-[22px]">notifications</span>
-        </button>
+        </a>
       </div>
     </header>
 
@@ -97,11 +97,10 @@
       </section>
 
       <!-- Status Legend Mini -->
-      <section class="bg-white border border-[#E6E9ED] rounded-xl px-3 py-2 flex items-center justify-between text-[10px] font-semibold text-[#111d28]">
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#2E9E6B]"></span> Tersedia</div>
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#D64550]"></span> Terpakai</div>
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#C98A00]"></span> Menunggu</div>
-        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-[#6B7785]"></span> Maintenance</div>
+      <section class="bg-white border border-[#E6E9ED] rounded-xl px-3 py-2 flex items-center justify-around text-[10px] font-semibold text-[#111d28]">
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#2E9E6B]"></span> Tersedia</div>
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#D64550]"></span> Terpakai / Terisi</div>
+        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#6B7785]"></span> Maintenance</div>
       </section>
 
       <!-- Dynamic Room Cards List -->
@@ -114,16 +113,16 @@
       <div class="bg-white border border-[#c2c6d3] rounded-2xl p-3 shadow-lg pointer-events-auto flex items-center justify-between gap-2">
         <div class="flex flex-col min-w-0">
           <div class="flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-[#2E9E6B]"></span>
+            <span id="sticky-slot-dot" class="w-2 h-2 rounded-full bg-[#2E9E6B]"></span>
             <span id="sticky-slot-date" class="text-[10px] font-bold text-[#2E9E6B] uppercase">Kam, 22 Okt 2026</span>
           </div>
-          <p id="sticky-slot-room" class="text-xs text-[#111d28] font-extrabold truncate">Ruang Teori 1.2 (10:20 - 12:00)</p>
+          <p id="sticky-slot-room" class="text-xs text-[#111d28] font-extrabold truncate">Ruang Teori 1.2 (08:40 - 10:20)</p>
         </div>
         <div class="flex items-center gap-1.5 shrink-0">
           <button onclick="goToSelectedRoomDetail()" type="button" class="h-10 px-2.5 rounded-xl border border-[#1F5FA8] text-[#1F5FA8] font-bold text-xs hover:bg-[#DCEBFA]/40">
             Detail
           </button>
-          <button onclick="proceedToBookingForm()" type="button" class="h-10 px-3.5 bg-[#1F5FA8] hover:bg-[#14325C] text-white font-bold text-xs rounded-xl flex items-center gap-1 shadow-xs">
+          <button id="btn-sticky-submit" onclick="proceedToBookingForm()" type="button" class="h-10 px-3.5 bg-[#1F5FA8] hover:bg-[#14325C] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs rounded-xl flex items-center gap-1 shadow-xs">
             <span>Ajukan Pinjam</span>
             <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
           </button>
@@ -149,7 +148,7 @@
     let requireSmartboard = false;
     let selectedDateObj = datesList[3]; // Default Kamis 22 Okt
     let selectedRoomId = 'rt-102';
-    let selectedTimeRange = '10:20 - 12:00';
+    let selectedTimeRange = '08:40 - 10:20';
 
     function renderDateStrip() {
       const s = window.SIPRK.getSession();
@@ -186,6 +185,7 @@
 
     function selectDate(idx) {
       selectedDateObj = datesList[idx];
+      ensureValidSelectedSlot();
       renderDateStrip();
       updateStickyBar();
       renderRoomCards();
@@ -220,7 +220,46 @@
       setBuildingFilter('all');
     }
 
+    function ensureValidSelectedSlot() {
+      const rooms = window.SIPRK.getRooms();
+      const currentRoom = rooms.find(r => r.id === selectedRoomId);
+      if (currentRoom && currentRoom.status === 'tersedia' && selectedTimeRange) {
+        const parts = selectedTimeRange.split(' - ');
+        if (parts.length === 2) {
+          const check = window.SIPRK.checkSlotConflict(currentRoom.id, selectedDateObj.full, parts[0], parts[1]);
+          if (!check.conflict) return true;
+        }
+      }
+
+      // Cari slot tersedia pertama pada ruangan saat ini
+      if (currentRoom && currentRoom.status === 'tersedia') {
+        const freeOnCurrent = getSlotsForRoomAndDate(currentRoom, selectedDateObj).find(sl => !sl.conflict && sl.status === 'tersedia');
+        if (freeOnCurrent) {
+          selectedTimeRange = freeOnCurrent.time;
+          return true;
+        }
+      }
+
+      // Fallback cari slot tersedia di ruangan lain
+      for (const r of rooms) {
+        if (r.status !== 'tersedia') continue;
+        const freeSlot = getSlotsForRoomAndDate(r, selectedDateObj).find(sl => !sl.conflict && sl.status === 'tersedia');
+        if (freeSlot) {
+          selectedRoomId = r.id;
+          selectedTimeRange = freeSlot.time;
+          return true;
+        }
+      }
+
+      selectedTimeRange = '';
+      return false;
+    }
+
     function selectRoomSlot(roomId, timeRange) {
+      const parts = String(timeRange || '').split(' - ');
+      if (parts.length !== 2) return;
+      const check = window.SIPRK.checkSlotConflict(roomId, selectedDateObj.full, parts[0], parts[1]);
+      if (check.conflict) return;
       selectedRoomId = roomId;
       selectedTimeRange = timeRange;
       updateStickyBar();
@@ -229,10 +268,33 @@
 
     function updateStickyBar() {
       const room = window.SIPRK.getRoomById(selectedRoomId);
-      document.getElementById('sticky-slot-date').textContent = `Tersedia • ${selectedDateObj.label}`;
-      document.getElementById('sticky-slot-room').textContent = `${room.name} (${selectedTimeRange})`;
+      const dotEl = document.getElementById('sticky-slot-dot');
+      const dateEl = document.getElementById('sticky-slot-date');
+      const roomEl = document.getElementById('sticky-slot-room');
+      const submitBtn = document.getElementById('btn-sticky-submit');
 
-      const parts = selectedTimeRange.split(' - ');
+      const parts = String(selectedTimeRange || '').split(' - ');
+      const hasValid = room && room.status === 'tersedia' && parts.length === 2 && !window.SIPRK.checkSlotConflict(room.id, selectedDateObj.full, parts[0], parts[1]).conflict;
+
+      if (!hasValid) {
+        if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-[#D64550]';
+        if (dateEl) {
+          dateEl.textContent = `Penuh • ${selectedDateObj.label}`;
+          dateEl.className = 'text-[10px] font-bold text-[#D64550] uppercase';
+        }
+        if (roomEl) roomEl.textContent = 'Semua slot waktu pada tanggal ini terisi';
+        if (submitBtn) submitBtn.disabled = true;
+        return;
+      }
+
+      if (dotEl) dotEl.className = 'w-2 h-2 rounded-full bg-[#2E9E6B]';
+      if (dateEl) {
+        dateEl.textContent = `Tersedia • ${selectedDateObj.label}`;
+        dateEl.className = 'text-[10px] font-bold text-[#2E9E6B] uppercase';
+      }
+      if (roomEl) roomEl.textContent = `${room.name} (${selectedTimeRange})`;
+      if (submitBtn) submitBtn.disabled = false;
+
       window.SIPRK.setSelectedSlot({
         roomId: room.id,
         roomCode: room.code,
@@ -241,15 +303,18 @@
         capacity: room.capacity,
         date: selectedDateObj.full,
         dateFormatted: selectedDateObj.label,
-        startTime: parts[0] || '10:20',
-        endTime: parts[1] || '12:00'
+        startTime: parts[0],
+        endTime: parts[1]
       });
     }
 
     function goToSelectedRoomDetail(customRoomId) {
       const rId = customRoomId || selectedRoomId;
       const room = window.SIPRK.getRoomById(rId);
-      const parts = selectedTimeRange.split(' - ');
+      const roomSlots = getSlotsForRoomAndDate(room, selectedDateObj);
+      const firstFree = roomSlots.find(sl => !sl.conflict && sl.status === 'tersedia');
+      const chosenTime = (rId === selectedRoomId && selectedTimeRange) ? selectedTimeRange : (firstFree ? firstFree.time : '');
+      const parts = chosenTime.split(' - ');
       window.SIPRK.setSelectedSlot({
         roomId: room.id,
         roomCode: room.code,
@@ -258,15 +323,20 @@
         capacity: room.capacity,
         date: selectedDateObj.full,
         dateFormatted: selectedDateObj.label,
-        startTime: parts[0] || '10:20',
-        endTime: parts[1] || '12:00'
+        startTime: parts[0] || '',
+        endTime: parts[1] || ''
       });
       window.location.href = `s04-detail-ruangan.html?room=${encodeURIComponent(room.id)}`;
     }
 
     function proceedToBookingForm() {
+      if (!ensureValidSelectedSlot()) return;
       updateStickyBar();
       window.location.href = 's05-form-peminjaman.html';
+    }
+
+    function getSlotsForRoomAndDate(room, dateObj) {
+      return window.SIPRK.getRoomSlotsForDate(room, dateObj.full);
     }
 
     function renderRoomCards() {
@@ -295,6 +365,7 @@
 
       cont.innerHTML = filtered.map(r => {
         const isMaint = r.status === 'maintenance';
+        const dynamicSlots = getSlotsForRoomAndDate(r, selectedDateObj);
         return `
           <article class="bg-white border border-[#E6E9ED] rounded-2xl p-3.5 shadow-2xs space-y-2.5">
             <div class="flex items-start justify-between pb-2 border-b border-[#E6E9ED]">
@@ -327,48 +398,38 @@
               <div>
                 <span class="text-[10px] font-bold text-[#6B7785] uppercase tracking-wider block mb-1.5">Pilih Slot Waktu (${selectedDateObj.label}):</span>
                 <div class="flex items-stretch gap-2 overflow-x-auto no-scrollbar pb-1">
-                  ${(r.slots || []).map(sl => {
-                    const isSelected = (selectedRoomId === r.id && selectedTimeRange === sl.time);
-                    if (sl.status === 'terpakai') {
+                  ${dynamicSlots.map(sl => {
+                    const isAvailable = !sl.conflict && sl.status === 'tersedia';
+                    const isSelected = isAvailable && (selectedRoomId === r.id && selectedTimeRange === sl.time);
+                    if (!isAvailable) {
                       return `
-                        <div class="min-w-[125px] p-2.5 rounded-xl bg-[#F9DADD]/60 border border-[#D64550]/40 shrink-0 opacity-90">
+                        <div title="${(sl.fullDetail || sl.shortLabel || '').replace(/"/g, '&quot;')}" class="min-w-[148px] max-w-[175px] p-2.5 rounded-2xl bg-[#F9DADD]/50 border border-[#D64550]/40 shrink-0 select-none cursor-not-allowed">
                           <div class="flex items-center justify-between text-[#D64550]">
-                            <span class="text-[11px] font-bold">${sl.time}</span>
-                            <span class="material-symbols-outlined text-[14px]">cancel</span>
+                            <span class="text-xs font-bold">${sl.time}</span>
+                            <span class="material-symbols-outlined text-[17px]">cancel</span>
                           </div>
-                          <span class="text-[10px] font-semibold text-[#D64550] block mt-1.5 truncate">${sl.label}</span>
+                          <span class="text-[11px] font-bold text-[#93000a] block mt-1.5 truncate leading-tight">${sl.shortLabel || 'Sudah Terpakai'}</span>
                         </div>
-                      `;
-                    }
-                    if (sl.status === 'menunggu') {
-                      return `
-                        <button onclick="selectRoomSlot('${r.id}', '${sl.time}')" type="button" class="min-w-[125px] p-2.5 rounded-xl bg-[#FFF0C2]/70 border border-[#C98A00]/50 text-left shrink-0">
-                          <div class="flex items-center justify-between text-[#8C6000]">
-                            <span class="text-[11px] font-bold">${sl.time}</span>
-                            <span class="material-symbols-outlined text-[14px]">schedule</span>
-                          </div>
-                          <span class="text-[10px] font-semibold text-[#8C6000] block mt-1.5 truncate">${sl.label}</span>
-                        </button>
                       `;
                     }
                     if (isSelected) {
                       return `
-                        <button onclick="selectRoomSlot('${r.id}', '${sl.time}')" type="button" class="min-w-[125px] p-2.5 rounded-xl bg-[#1F5FA8] text-white border-2 border-[#14325C] text-left shrink-0 shadow-xs">
+                        <button onclick="selectRoomSlot('${r.id}', '${sl.time}')" type="button" class="min-w-[130px] p-2.5 rounded-2xl bg-[#1F5FA8] text-white border-2 border-[#14325C] text-left shrink-0 shadow-xs">
                           <div class="flex items-center justify-between">
-                            <span class="text-[11px] font-bold">${sl.time}</span>
-                            <span class="material-symbols-outlined text-[14px]">task_alt</span>
+                            <span class="text-xs font-bold">${sl.time}</span>
+                            <span class="material-symbols-outlined text-[16px]">task_alt</span>
                           </div>
-                          <span class="text-[10px] font-bold block mt-1.5">Slot Terpilih</span>
+                          <span class="text-[11px] font-bold block mt-1.5">Slot Terpilih</span>
                         </button>
                       `;
                     }
                     return `
-                      <button onclick="selectRoomSlot('${r.id}', '${sl.time}')" type="button" class="min-w-[125px] p-2.5 rounded-xl bg-[#D8F1E4]/70 hover:bg-[#D8F1E4] border border-[#2E9E6B]/40 text-left shrink-0 transition-all">
+                      <button onclick="selectRoomSlot('${r.id}', '${sl.time}')" type="button" class="min-w-[130px] p-2.5 rounded-2xl bg-[#D8F1E4]/70 hover:bg-[#D8F1E4] border border-[#2E9E6B]/40 text-left shrink-0 transition-all">
                         <div class="flex items-center justify-between text-[#2E9E6B]">
-                          <span class="text-[11px] font-bold">${sl.time}</span>
-                          <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                          <span class="text-xs font-bold">${sl.time}</span>
+                          <span class="material-symbols-outlined text-[16px]">check_circle</span>
                         </div>
-                        <span class="text-[10px] font-semibold text-[#2E9E6B] block mt-1.5">Tersedia • Pilih</span>
+                        <span class="text-[11px] font-bold text-[#2E9E6B] block mt-1.5">Tersedia • Pilih</span>
                       </button>
                     `;
                   }).join('')}
@@ -382,6 +443,7 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       await window.SIPRK.syncFromServer();
+      ensureValidSelectedSlot();
       renderDateStrip();
       updateStickyBar();
       renderRoomCards();

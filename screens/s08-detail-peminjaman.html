@@ -227,22 +227,6 @@
             </a>
           </div>
         `;
-      } else if (activeBooking.status === 'konflik') {
-        chipBox.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-[#FFF1E6] text-[#D46B1D]"><span class="material-symbols-outlined text-[15px]">warning</span>Konflik Jadwal</span>`;
-        bannerBox.innerHTML = `
-          <div class="bg-[#FFF1E6] border-l-4 border-[#F2A35E] p-3.5 rounded-r-xl text-xs space-y-1">
-            <p class="font-bold text-[#8C3F08]">Peringatan Konflik Jadwal</p>
-            <p class="text-[#111d28]">${activeBooking.conflictNote || 'Terdapat irisan jadwal pada slot yang dipilih.'}</p>
-          </div>
-        `;
-        actionsBox.innerHTML = `
-          <div class="grid grid-cols-2 gap-2.5">
-            <button onclick="cancelThisBooking()" type="button" class="h-11 rounded-xl border border-[#D64550] text-[#D64550] font-bold text-xs">Batalkan</button>
-            <a href="s03-jadwal.html" class="h-11 rounded-xl bg-[#D46B1D] text-white font-bold text-xs flex items-center justify-center gap-1">
-              Pilih Ruang Lain
-            </a>
-          </div>
-        `;
       } else if (activeBooking.status === 'dibatalkan') {
         chipBox.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-[#E6E9ED] text-[#424751]">Dibatalkan</span>`;
         bannerBox.innerHTML = '';

@@ -93,7 +93,6 @@
         all: bookings.length,
         menunggu: bookings.filter(b => b.status === 'menunggu').length,
         disetujui: bookings.filter(b => b.status === 'disetujui').length,
-        konflik: bookings.filter(b => b.status === 'konflik').length,
         draf: bookings.filter(b => b.status === 'draf').length,
         ditolak: bookings.filter(b => b.status === 'ditolak').length,
         dibatalkan: bookings.filter(b => b.status === 'dibatalkan').length
@@ -103,7 +102,6 @@
         { key: 'all', label: 'Semua' },
         { key: 'menunggu', label: 'Menunggu' },
         { key: 'disetujui', label: 'Disetujui' },
-        { key: 'konflik', label: 'Konflik' },
         { key: 'draf', label: 'Draf' },
         { key: 'ditolak', label: 'Ditolak' },
         { key: 'dibatalkan', label: 'Dibatalkan' }
@@ -156,8 +154,6 @@
         let statusBadge = '';
         if (b.status === 'disetujui') {
           statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#D8F1E4] text-[#2E9E6B] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">check_circle</span>Disetujui</span>`;
-        } else if (b.status === 'konflik') {
-          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF1E6] text-[#D46B1D] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">warning</span>Konflik</span>`;
         } else if (b.status === 'ditolak') {
           statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F9DADD] text-[#D64550] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">cancel</span>Ditolak</span>`;
         } else if (b.status === 'draf') {
