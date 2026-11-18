@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>S14 — Dashboard &amp; Evaluasi Penggunaan Ruangan | SIPRK UB</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #1B2733;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-24 shadow-[0_0_40px_rgba(20,50,92,0.15)] border-x border-[#c2c6d3]/60">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-40 bg-[#14325C] text-white px-4 h-14 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-white/10 p-1 border border-white/20 flex items-center justify-center">
+          <img src="../assets/logo-ub.png" alt="Logo UB" class="w-full h-full object-contain"/>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-base font-extrabold tracking-tight leading-none">SIPRK Evaluasi</span>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">S14</span>
+          </div>
+          <span id="header-role-sub" class="text-[10px] text-[#c5daff] block mt-0.5">Universitas Brawijaya</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1">
+        <button aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10">
+          <span class="material-symbols-outlined text-[21px]">notifications</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-4 pt-4 space-y-4">
+
+      <!-- Period Filter & Export CTA (DSB-02 & DSB-03) -->
+      <section class="bg-white rounded-2xl border border-[#E6E9ED] p-3.5 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h1 class="text-base font-extrabold text-[#14325C]">Dashboard Penggunaan Ruangan</h1>
+            <p class="text-[11px] text-[#6B7785]">Data statistik okupansi &amp; evaluasi aset fakultas</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="period-select" onchange="updatePeriod(this.value)" class="flex-1 h-10 px-3 rounded-xl border border-[#c2c6d3] text-xs font-semibold text-[#1B2733] bg-[#F5F7FA]">
+            <option value="okt2026" selected>Periode: Oktober 2026</option>
+            <option value="semGasal">Semester Gasal 2026/2027</option>
+          </select>
+          <button onclick="openExportModal()" type="button" class="h-10 px-3.5 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] text-white text-xs font-bold flex items-center gap-1.5 shadow-xs shrink-0">
+            <span class="material-symbols-outlined text-[17px]">download</span>
+            <span>Unduh Laporan</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Empty State (If Empty Period Selected) -->
+      <div id="dsb-empty-state" class="hidden bg-white rounded-2xl border border-[#E6E9ED] p-8 text-center space-y-2.5">
+        <span class="material-symbols-outlined text-4xl text-[#6B7785]">analytics</span>
+        <h3 class="text-sm font-bold text-[#14325C]">Belum Ada Data pada Periode Ini</h3>
+        <p class="text-xs text-[#6B7785]">Silakan pilih periode bulan atau semester lain yang memiliki aktivitas peminjaman.</p>
+        <button onclick="document.getElementById('period-select').value='okt2026'; updatePeriod('okt2026');" type="button" class="px-4 py-2 rounded-xl bg-[#1F5FA8] text-white text-xs font-bold">
+          Kembali ke Oktober 2026
+        </button>
+      </div>
+
+      <!-- Dashboard Widgets Container -->
+      <div id="dsb-widgets" class="space-y-4">
+
+        <!-- 4 KPI Cards (2x2 Grid matching Wireframe S14) -->
+        <section class="grid grid-cols-2 gap-2.5">
+          <div class="bg-white rounded-xl border border-[#E6E9ED] p-3.5 shadow-2xs">
+            <span class="text-[11px] font-medium text-[#6B7785] block">Total peminjaman</span>
+            <span id="kpi-total" class="text-2xl font-extrabold text-[#1B2733] tabular-nums block mt-0.5">248</span>
+            <span class="text-[11px] font-bold text-[#2E9E6B] block mt-0.5">+12% vs bulan lalu</span>
+          </div>
+          <div class="bg-white rounded-xl border border-[#E6E9ED] p-3.5 shadow-2xs">
+            <span class="text-[11px] font-medium text-[#6B7785] block">Tingkat okupansi</span>
+            <span id="kpi-occ" class="text-2xl font-extrabold text-[#1B2733] tabular-nums block mt-0.5">68%</span>
+            <span class="text-[11px] font-bold text-[#2E9E6B] block mt-0.5">+5 poin</span>
+          </div>
+          <div class="bg-white rounded-xl border border-[#E6E9ED] p-3.5 shadow-2xs">
+            <span class="text-[11px] font-medium text-[#6B7785] block">Disetujui</span>
+            <span id="kpi-app" class="text-2xl font-extrabold text-[#1B2733] tabular-nums block mt-0.5">81%</span>
+            <span class="text-[11px] font-medium text-[#6B7785] block mt-0.5">Ditolak 9%</span>
+          </div>
+          <div class="bg-white rounded-xl border border-[#E6E9ED] p-3.5 shadow-2xs">
+            <span class="text-[11px] font-medium text-[#6B7785] block">Konflik terdeteksi</span>
+            <span id="kpi-conf" class="text-2xl font-extrabold text-[#1B2733] tabular-nums block mt-0.5">14</span>
+            <span class="text-[11px] font-bold text-[#2E9E6B] block mt-0.5">-4 vs bulan lalu</span>
+          </div>
+        </section>
+
+        <!-- Bar Chart: Okupansi per hari (%) -->
+        <section class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-[#14325C]">Okupansi per Hari (%)</h2>
+            <span class="text-[10px] font-semibold text-[#1F5FA8] bg-[#DCEBFA] px-2 py-0.5 rounded">Puncak: Kamis 90%</span>
+          </div>
+          <div class="h-40 pt-4 flex items-end justify-between gap-2.5 px-2 border-b border-[#E6E9ED]">
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold text-[#1B2733]">72%</span>
+              <div class="w-full bg-[#1F5FA8] rounded-t-md h-[96px]"></div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold text-[#1B2733]">85%</span>
+              <div class="w-full bg-[#1F5FA8] rounded-t-md h-[114px]"></div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold text-[#1B2733]">78%</span>
+              <div class="w-full bg-[#1F5FA8] rounded-t-md h-[104px]"></div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <span class="text-[10px] font-extrabold text-[#14325C]">90%</span>
+              <div class="w-full bg-[#14325C] rounded-t-md h-[122px]"></div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold text-[#1B2733]">64%</span>
+              <div class="w-full bg-[#7BA9E0] rounded-t-md h-[84px]"></div>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-1">
+              <span class="text-[10px] font-bold text-[#6B7785]">30%</span>
+              <div class="w-full bg-[#adc7fa] rounded-t-md h-[40px]"></div>
+            </div>
+          </div>
+          <div class="flex justify-between px-3 text-[11px] font-medium text-[#6B7785]">
+            <span>Sen</span><span>Sel</span><span>Rab</span><span class="font-bold text-[#14325C]">Kam</span><span>Jum</span><span>Sab</span>
+          </div>
+        </section>
+
+        <!-- Donut Chart: Status Pengajuan -->
+        <section class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-3">
+          <h2 class="text-sm font-bold text-[#14325C]">Distribusi Status Pengajuan</h2>
+          <div class="flex items-center justify-around gap-4 py-1">
+            <!-- Conic Gradient Donut -->
+            <div class="relative w-28 h-28 rounded-full flex items-center justify-center" style="background: conic-gradient(#2E9E6B 0% 81%, #C98A00 81% 91%, #D64550 91% 100%);">
+              <div class="w-18 h-18 bg-white rounded-full flex flex-col items-center justify-center" style="width: 72px; height: 72px;">
+                <span id="donut-total" class="text-lg font-extrabold text-[#14325C] leading-none">248</span>
+                <span class="text-[9px] text-[#6B7785]">Total</span>
+              </div>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-sm bg-[#2E9E6B]"></span>
+                <span class="text-[#1B2733] font-medium">Disetujui <strong>81%</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-sm bg-[#C98A00]"></span>
+                <span class="text-[#1B2733] font-medium">Pending <strong>10%</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-sm bg-[#D64550]"></span>
+                <span class="text-[#1B2733] font-medium">Ditolak <strong>9%</strong></span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Ruangan Terpopuler (Wireframe S14) -->
+        <section class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-3">
+          <h2 class="text-sm font-bold text-[#14325C]">Ruangan Terpopuler</h2>
+          <div class="divide-y divide-[#E6E9ED] text-xs">
+            <div class="py-2.5 flex items-center justify-between">
+              <div>
+                <p class="font-bold text-[#1B2733]">Ruang 1.1 (GKB-A)</p>
+                <p class="text-[11px] text-[#6B7785]">42 peminjaman • 168 jam terpakai</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-[#DCEBFA] text-[#1F5FA8] font-bold">82%</span>
+            </div>
+            <div class="py-2.5 flex items-center justify-between">
+              <div>
+                <p class="font-bold text-[#1B2733]">Aula Kecil Lt. 1</p>
+                <p class="text-[11px] text-[#6B7785]">31 peminjaman • 140 jam terpakai</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-[#DCEBFA] text-[#1F5FA8] font-bold">74%</span>
+            </div>
+            <div class="py-2.5 flex items-center justify-between">
+              <div>
+                <p class="font-bold text-[#1B2733]">Lab Jarkom 3.4 (FILKOM)</p>
+                <p class="text-[11px] text-[#6B7785]">28 peminjaman • 122 jam terpakai</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-[#DCEBFA] text-[#1F5FA8] font-bold">69%</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Heatmap Jam Sibuk (DSB-04) -->
+        <section class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <h2 class="text-sm font-bold text-[#14325C]">Heatmap Jam Sibuk (DSB-04)</h2>
+            <span class="text-[10px] text-[#6B7785]">07:00 – 17:00 WIB</span>
+          </div>
+          <div class="grid grid-cols-5 gap-1.5 text-[10px] text-center font-semibold">
+            <div class="p-2 rounded bg-[#DCEBFA] text-[#14325C]">07-09<br/>45%</div>
+            <div class="p-2 rounded bg-[#1F5FA8] text-white">09-11<br/>88%</div>
+            <div class="p-2 rounded bg-[#14325C] text-white">11-13<br/>92%</div>
+            <div class="p-2 rounded bg-[#1F5FA8] text-white">13-15<br/>84%</div>
+            <div class="p-2 rounded bg-[#DCEBFA] text-[#14325C]">15-17<br/>52%</div>
+          </div>
+          <div class="flex items-center justify-end gap-3 text-[10px] text-[#6B7785] pt-1">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-[#DCEBFA]"></span> Rendah</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-[#1F5FA8]"></span> Tinggi</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-xs bg-[#14325C]"></span> Sangat Padat</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Export Modal (DSB-03) -->
+    <div id="export-modal" class="fixed inset-0 z-50 hidden bg-[#14325C]/50 backdrop-blur-xs flex items-end justify-center">
+      <div class="w-full max-w-[430px] bg-white rounded-t-2xl p-5 space-y-3.5 shadow-2xl">
+        <div class="flex items-center justify-between border-b border-[#E6E9ED] pb-2.5">
+          <h3 class="text-sm font-bold text-[#14325C]">Unduh Laporan Okupansi (DSB-03)</h3>
+          <button onclick="document.getElementById('export-modal').classList.add('hidden')" type="button" class="text-[#6B7785]">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <p class="text-xs text-[#424751]">Pilih format berkas laporan sesuai filter periode aktif:</p>
+        <div class="grid grid-cols-2 gap-2.5">
+          <button onclick="downloadReport('PDF')" type="button" class="p-3 rounded-xl border border-[#c2c6d3] hover:border-[#1F5FA8] flex flex-col items-center gap-1 text-xs font-bold text-[#14325C]">
+            <span class="material-symbols-outlined text-[#D64550] text-2xl">picture_as_pdf</span>
+            <span>Laporan .PDF</span>
+          </button>
+          <button onclick="downloadReport('Excel')" type="button" class="p-3 rounded-xl border border-[#c2c6d3] hover:border-[#2E9E6B] flex flex-col items-center gap-1 text-xs font-bold text-[#14325C]">
+            <span class="material-symbols-outlined text-[#2E9E6B] text-2xl">table_view</span>
+            <span>Data .XLSX</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav id="siprk-bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40 h-16 bg-white border-t border-[#E6E9ED] shadow-[0_-2px_10px_rgba(20,50,92,0.06)] flex items-center justify-around px-1"></nav>
+  </div>
+
+  <script>
+    function renderDashboardKPIs() {
+      const bookings = (window.SIPRK ? window.SIPRK.getBookings() : []).filter(b => b.status !== 'draft');
+      const total = bookings.length;
+      const approved = bookings.filter(b => b.status === 'disetujui').length;
+      const conflicts = bookings.filter(b => b.status === 'konflik').length;
+      const appPct = total > 0 ? Math.round((approved / total) * 100) : 80;
+
+      const period = document.getElementById('period-select').value;
+      if (period === 'semGasal') {
+        document.getElementById('kpi-total').textContent = (total + 1120).toLocaleString('id-ID');
+        document.getElementById('donut-total').textContent = (total + 1120).toLocaleString('id-ID');
+        document.getElementById('kpi-occ').textContent = '74%';
+        document.getElementById('kpi-app').textContent = '86%';
+        document.getElementById('kpi-conf').textContent = String(conflicts + 38);
+      } else {
+        document.getElementById('kpi-total').textContent = String(total + 240);
+        document.getElementById('donut-total').textContent = String(total + 240);
+        document.getElementById('kpi-occ').textContent = '68%';
+        document.getElementById('kpi-app').textContent = `${appPct}%`;
+        document.getElementById('kpi-conf').textContent = String(conflicts + 13);
+      }
+    }
+
+    function updatePeriod(val) {
+      renderDashboardKPIs();
+    }
+
+    function openExportModal() {
+      document.getElementById('export-modal').classList.remove('hidden');
+    }
+
+    function downloadReport(type) {
+      document.getElementById('export-modal').classList.add('hidden');
+      const period = document.getElementById('period-select').value;
+      alert(`Berhasil mengunduh: Laporan_Okupansi_SIPRK_UB_${period}_2026-10-19.${type === 'PDF' ? 'pdf' : 'xlsx'}`);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const s = window.SIPRK.getSession();
+      document.getElementById('header-role-sub').textContent = `${s.shortName} (${s.roleLabel}) • UB`;
+      renderDashboardKPIs();
+    });
+    window.addEventListener('siprk:db-synced', renderDashboardKPIs);
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

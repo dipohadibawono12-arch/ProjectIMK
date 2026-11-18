@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>SIPRK Universitas Brawijaya — Sistem Informasi Peminjaman Ruang Kelas</title>
+  <link rel="icon" type="image/png" href="assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #1B2733;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <!-- Mobile App Viewport (max-w-430px) -->
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-28 shadow-[0_0_40px_rgba(20,50,92,0.15)] border-x border-[#c2c6d3]/60">
+
+    <!-- Sticky Mobile Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E6E9ED] px-4 h-14 flex items-center justify-between shadow-2xs">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-[#14325C] p-1 flex items-center justify-center shadow-xs">
+          <img src="assets/logo-ub.png" alt="Logo Universitas Brawijaya" class="w-full h-full object-contain"/>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-base font-extrabold tracking-tight text-[#14325C] leading-none">SIPRK</span>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000] border border-[#D4AF37]/40 leading-none">UB</span>
+          </div>
+          <span class="text-[10px] font-medium text-[#6B7785] block mt-0.5">Universitas Brawijaya</span>
+        </div>
+      </div>
+      <a href="screens/s01-login.html" class="h-9 px-3.5 rounded-lg bg-[#1F5FA8] hover:bg-[#14325C] text-white text-xs font-semibold flex items-center gap-1.5 shadow-xs active:scale-95 transition-all">
+        <span class="material-symbols-outlined text-[16px]">login</span>
+        <span>Masuk SSO</span>
+      </a>
+    </header>
+
+    <!-- Main Mobile Content -->
+    <main class="flex-1 px-4 pt-4 space-y-5">
+
+      <!-- 1. Hero Banner Universitas Brawijaya -->
+      <section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0F2747] via-[#14325C] to-[#1F5FA8] text-white p-5 shadow-md">
+        <div class="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-[#D4AF37]/20 blur-2xl pointer-events-none"></div>
+        <div class="relative z-10 space-y-3.5">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-xs border border-white/20 text-[11px] font-medium text-[#FFF0C2]">
+            <img src="assets/logo-ub.png" alt="UB" class="w-4 h-4 object-contain"/>
+            <span>Layanan Sarana &amp; Prasarana Akademik UB</span>
+          </div>
+
+          <h1 class="text-[22px] font-extrabold leading-[1.25] tracking-tight">
+            Pinjam &amp; Pantau Ruang Kelas Kampus <span class="text-[#FFD966]">Bebas Bentrok.</span>
+          </h1>
+
+          <p class="text-xs text-[#c5daff] leading-relaxed">
+            Satu pintu digital bagi civitas akademika Universitas Brawijaya untuk memeriksa ketersediaan ruang kuliah, laboratorium, dan auditorium serta mengajukan peminjaman secara transparan.
+          </p>
+
+          <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+            <div class="bg-white/10 backdrop-blur-xs rounded-xl p-2 border border-white/15">
+              <span class="text-base font-extrabold text-[#FFD966] block leading-none">≤ 3 Mnt</span>
+              <span class="text-[10px] text-white/85 mt-1 block">Pengajuan</span>
+            </div>
+            <div class="bg-white/10 backdrop-blur-xs rounded-xl p-2 border border-white/15">
+              <span class="text-base font-extrabold text-[#84eeb4] block leading-none">1x24 Jam</span>
+              <span class="text-[10px] text-white/85 mt-1 block">Target SLA</span>
+            </div>
+            <div class="bg-white/10 backdrop-blur-xs rounded-xl p-2 border border-white/15">
+              <span class="text-base font-extrabold text-white block leading-none">QR Code</span>
+              <span class="text-[10px] text-white/85 mt-1 block">E-Tiket Ruang</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Live Status Ketersediaan Ruangan Kampus (Tersinkronisasi dari Database) -->
+      <section class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-bold text-[#14325C]">Status Ketersediaan Ruang Hari Ini</h2>
+            <p class="text-[11px] text-[#6B7785]">Gedung Kuliah Bersama (GKB) &amp; FILKOM UB</p>
+          </div>
+          <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#2E9E6B] bg-[#D8F1E4] px-2 py-0.5 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#2E9E6B] animate-pulse"></span>
+            Live
+          </span>
+        </div>
+
+        <!-- Status Legend -->
+        <div class="grid grid-cols-4 gap-1.5 text-[10px] font-semibold text-center">
+          <div class="py-1 px-1 rounded-lg bg-[#D8F1E4] text-[#2E9E6B] flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">check_circle</span> Tersedia
+          </div>
+          <div class="py-1 px-1 rounded-lg bg-[#F9DADD] text-[#D64550] flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">cancel</span> Terpakai
+          </div>
+          <div class="py-1 px-1 rounded-lg bg-[#FFF0C2] text-[#C98A00] flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">schedule</span> Menunggu
+          </div>
+          <div class="py-1 px-1 rounded-lg bg-[#E6E9ED] text-[#6B7785] flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[12px]">build</span> Maintenance
+          </div>
+        </div>
+
+        <!-- Dynamic Room Rows from DB -->
+        <div id="landing-rooms-list" class="divide-y divide-[#E6E9ED] text-xs"></div>
+      </section>
+
+      <!-- 3. Fasilitas Gedung Terintegrasi -->
+      <section class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-3">
+        <h2 class="text-sm font-bold text-[#14325C]">Gedung &amp; Sarana Akademik Terintegrasi</h2>
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <div class="p-3 rounded-xl bg-[#F5F7FA] border border-[#E6E9ED] space-y-1">
+            <div class="w-8 h-8 rounded-lg bg-[#DCEBFA] text-[#1F5FA8] flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px]">apartment</span>
+            </div>
+            <p class="font-bold text-[#14325C] pt-1">GKB-A &amp; GKB-B</p>
+            <p class="text-[11px] text-[#6B7785]">Ruang kelas teori reguler berkapasitas 30–60 kursi.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-[#F5F7FA] border border-[#E6E9ED] space-y-1">
+            <div class="w-8 h-8 rounded-lg bg-[#D8F1E4] text-[#2E9E6B] flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px]">desktop_windows</span>
+            </div>
+            <p class="font-bold text-[#14325C] pt-1">Lab Gedung F FILKOM</p>
+            <p class="text-[11px] text-[#6B7785]">Laboratorium komputer, jaringan, dan praktikum.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-[#F5F7FA] border border-[#E6E9ED] space-y-1">
+            <div class="w-8 h-8 rounded-lg bg-[#FFF0C2] text-[#C98A00] flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px]">podium</span>
+            </div>
+            <p class="font-bold text-[#14325C] pt-1">Auditorium Dekanat</p>
+            <p class="text-[11px] text-[#6B7785]">Aula seminar, sidang terbuka, dan kegiatan BEM/UKM.</p>
+          </div>
+          <div class="p-3 rounded-xl bg-[#F5F7FA] border border-[#E6E9ED] space-y-1">
+            <div class="w-8 h-8 rounded-lg bg-[#e3efff] text-[#14325C] flex items-center justify-center">
+              <span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+            </div>
+            <p class="font-bold text-[#14325C] pt-1">Akses E-Tiket Digital</p>
+            <p class="text-[11px] text-[#6B7785]">Bukti izin peminjaman terverifikasi dengan QR Code.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Alur Peminjaman 4 Langkah -->
+      <section class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-3">
+        <h2 class="text-sm font-bold text-[#14325C]">Alur Peminjaman Ruangan</h2>
+        <div class="space-y-2.5 text-xs">
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-[#14325C] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+            <div>
+              <p class="font-bold text-[#14325C]">Masuk dengan Akun SSO UB</p>
+              <p class="text-[11px] text-[#6B7785]">Gunakan email atau NIM/NIP resmi Universitas Brawijaya.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-[#1F5FA8] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+            <div>
+              <p class="font-bold text-[#14325C]">Pilih Tanggal, Fasilitas &amp; Slot Kosong</p>
+              <p class="text-[11px] text-[#6B7785]">Sistem otomatis mendeteksi dan mencegah bentrok jadwal kuliah.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-[#1F5FA8] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+            <div>
+              <p class="font-bold text-[#14325C]">Lengkapi Detail Kegiatan &amp; Dokumen</p>
+              <p class="text-[11px] text-[#6B7785]">Isi formulir singkat 4 langkah dan unggah surat/proposal kegiatan.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="w-6 h-6 rounded-full bg-[#2E9E6B] text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+            <div>
+              <p class="font-bold text-[#14325C]">Verifikasi Sarpras &amp; Terbit E-Tiket QR</p>
+              <p class="text-[11px] text-[#6B7785]">Terima notifikasi persetujuan dan gunakan QR Code saat hari kegiatan.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="pt-2 pb-4 text-center space-y-1">
+        <div class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#14325C]">
+          <img src="assets/logo-ub.png" alt="UB" class="w-4 h-4 object-contain"/>
+          <span>SIPRK Universitas Brawijaya</span>
+        </div>
+        <p class="text-[10px] text-[#6B7785]">
+          Direktorat Teknologi Informasi &amp; Sarana Prasarana Kampus UB
+        </p>
+      </footer>
+
+    </main>
+
+    <!-- Sticky Bottom CTA -->
+    <div class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-50 bg-white/95 backdrop-blur-md border-t border-[#E6E9ED] p-3 shadow-[0_-4px_16px_rgba(20,50,92,0.08)]">
+      <a href="screens/s01-login.html" class="w-full h-12 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] active:scale-[0.98] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all">
+        <span class="material-symbols-outlined text-[20px]">login</span>
+        <span>Masuk dengan SSO Kampus UB</span>
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', async () => {
+      await window.SIPRK.syncFromServer();
+      const rooms = window.SIPRK.getRooms();
+      const listEl = document.getElementById('landing-rooms-list');
+      if (!listEl) return;
+
+      listEl.innerHTML = rooms.slice(0, 4).map(r => {
+        const isAvail = r.status === 'tersedia';
+        return `
+          <div class="py-2.5 flex items-center justify-between gap-2">
+            <div>
+              <p class="font-bold text-[#1B2733]">${r.name} (${r.buildingShort})</p>
+              <p class="text-[11px] text-[#6B7785]">${r.capacity} Kursi • ${r.facilities.slice(0, 3).join(', ')}</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${isAvail ? 'bg-[#D8F1E4] text-[#2E9E6B]' : 'bg-[#E6E9ED] text-[#6B7785]'}">
+              ${isAvail ? 'Tersedia' : 'Maintenance'}
+            </span>
+          </div>
+        `;
+      }).join('');
+    });
+  </script>
+</body>
+</html>

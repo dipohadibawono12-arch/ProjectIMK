@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>Jadwal Saya (Dosen) — SIPRK Universitas Brawijaya</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #111d28;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-24 shadow-sm border-x border-[#E6E9ED]">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-40 flex justify-between items-center px-4 h-14 bg-white border-b border-[#E6E9ED] shadow-2xs">
+      <div class="flex items-center gap-2.5">
+        <a href="s02-beranda.html" class="w-9 h-9 rounded-xl bg-[#14325C] p-1 flex items-center justify-center shadow-xs">
+          <img src="../assets/logo-ub.png" alt="Logo UB" class="w-full h-full object-contain"/>
+        </a>
+        <div>
+          <span class="text-base font-extrabold text-[#004788] tracking-tight leading-none">SIPRK Dosen</span>
+          <span class="text-[10px] text-[#6B7785] block mt-0.5">Universitas Brawijaya</span>
+        </div>
+      </div>
+      <button aria-label="Notifikasi" class="w-9 h-9 rounded-full flex items-center justify-center text-[#424751] hover:bg-[#edf4ff]">
+        <span class="material-symbols-outlined text-[22px]">notifications</span>
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-4 pt-4 space-y-4 flex-1">
+
+      <!-- Identitas Dosen Card -->
+      <section class="bg-white border border-[#E6E9ED] rounded-2xl p-4 shadow-2xs">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#D8F1E4] text-[#2E9E6B] text-[10px] font-bold mb-1">
+              <span class="material-symbols-outlined text-[13px]">co_present</span>
+              Dosen Pengampu FILKOM UB
+            </span>
+            <h1 class="text-lg font-extrabold text-[#14325C]">Jadwal Mengajar &amp; Reservasi</h1>
+            <p id="dosen-name-label" class="text-xs text-[#424751] font-semibold mt-0.5">Dr. Rina Kusuma, S.Kom., M.T.</p>
+          </div>
+          <a href="s05-form-peminjaman.html" class="px-3 py-2 rounded-xl bg-[#1F5FA8] text-white text-xs font-bold flex items-center gap-1 shrink-0 shadow-2xs">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>Pinjam</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Filter Chips -->
+      <div class="flex items-center gap-1.5">
+        <button onclick="setDosenFilter('all')" id="dfilt-all" class="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white">Semua</button>
+        <button onclick="setDosenFilter('disetujui')" id="dfilt-disetujui" class="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E6E9ED] text-[#424751]">Disetujui</button>
+        <button onclick="setDosenFilter('menunggu')" id="dfilt-menunggu" class="px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E6E9ED] text-[#424751]">Menunggu / Konflik</button>
+      </div>
+
+      <!-- Dosen Schedule Cards List -->
+      <div id="dosen-bookings-list" class="space-y-3"></div>
+
+      <!-- Ekspor Kalender (.ics) Card (DSN-03) -->
+      <section class="bg-white border border-[#E6E9ED] rounded-2xl p-4 shadow-2xs space-y-2.5">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#1F5FA8] text-[20px]">event_repeat</span>
+          <h3 class="text-xs font-extrabold text-[#14325C]">Sinkronisasi Kalender Eksternal (.ics)</h3>
+        </div>
+        <p class="text-xs text-[#424751] leading-relaxed">
+          Unduh jadwal kelas pengganti dan reservasi ruangan Anda ke Google Calendar atau Apple Calendar.
+        </p>
+        <button onclick="downloadDosenIcs()" type="button" class="w-full h-11 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-2xs">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+          <span>Ekspor ke Kalender (.ics)</span>
+        </button>
+      </section>
+
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav id="siprk-bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto w-full z-50 flex justify-around items-center px-1 py-1 h-16 bg-white border-t border-[#E6E9ED] shadow-sm"></nav>
+  </div>
+
+  <script>
+    let dFilter = 'all';
+
+    function setDosenFilter(f) {
+      dFilter = f;
+      ['all', 'disetujui', 'menunggu'].forEach(k => {
+        document.getElementById('dfilt-' + k).className = (k === f)
+          ? 'px-3 py-1.5 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white'
+          : 'px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E6E9ED] text-[#424751]';
+      });
+      renderDosenList();
+    }
+
+    function renderDosenList() {
+      const bookings = window.SIPRK.getUserBookings();
+      const filtered = bookings.filter(b => {
+        if (dFilter === 'all') return true;
+        if (dFilter === 'disetujui') return b.status === 'disetujui';
+        return b.status === 'menunggu' || b.status === 'konflik';
+      });
+
+      const cont = document.getElementById('dosen-bookings-list');
+      if (filtered.length === 0) {
+        cont.innerHTML = `<div class="bg-white rounded-2xl border border-[#E6E9ED] p-6 text-center text-xs text-[#6B7785]">Belum ada jadwal reservasi pada filter ini.</div>`;
+        return;
+      }
+
+      cont.innerHTML = filtered.map(b => `
+        <article class="bg-white border border-[#E6E9ED] rounded-2xl p-4 shadow-2xs space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded bg-[#edf4ff] text-[#1F5FA8] text-[10px] font-bold">${b.category}</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${b.status === 'disetujui' ? 'bg-[#D8F1E4] text-[#2E9E6B]' : (b.status === 'konflik' ? 'bg-[#FFF1E6] text-[#D46B1D]' : 'bg-[#FFF0C2] text-[#8C6000]')}">${b.status.toUpperCase()}</span>
+          </div>
+          <h2 class="text-sm font-extrabold text-[#14325C]">${b.title}</h2>
+          <div class="text-xs text-[#424751] space-y-1">
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">calendar_today</span><span class="font-semibold text-[#111d28]">${b.dateFormatted} • ${b.startTime} - ${b.endTime} WIB</span></div>
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">meeting_room</span><span>${b.roomName} (${b.roomLocation})</span></div>
+          </div>
+          <div class="pt-2 border-t border-[#E6E9ED] flex justify-end">
+            <a href="s08-detail-peminjaman.html?id=${encodeURIComponent(b.id)}" class="px-3.5 py-1.5 rounded-xl bg-[#1F5FA8] text-white text-xs font-bold">
+              Lihat Detail &amp; QR
+            </a>
+          </div>
+        </article>
+      `).join('');
+    }
+
+    function downloadDosenIcs() {
+      const bookings = window.SIPRK.getUserBookings();
+      const events = bookings.map(b => [
+        "BEGIN:VEVENT",
+        `SUMMARY:${b.title}`,
+        `LOCATION:${b.roomName} - ${b.roomLocation}`,
+        "DTSTART:20261021T060000Z",
+        "DTEND:20261021T074000Z",
+        `DESCRIPTION:Kode Reservasi SIPRK UB: ${b.code}`,
+        "END:VEVENT"
+      ].join("\r\n")).join("\r\n");
+
+      const ics = `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//SIPRK Universitas Brawijaya//ID\r\n${events}\r\nEND:VCALENDAR`;
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'Jadwal_Mengajar_SIPRK_UB.ics';
+      a.click();
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await window.SIPRK.syncFromServer();
+      const s = window.SIPRK.getSession();
+      document.getElementById('dosen-name-label').textContent = `${s.name} • NIP ${s.idNumber}`;
+      renderDosenList();
+    });
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

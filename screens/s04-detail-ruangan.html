@@ -1,0 +1,288 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>Detail Ruangan — SIPRK Universitas Brawijaya</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #111d28;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <main class="w-full max-w-[430px] bg-white min-h-screen relative flex flex-col pb-36 shadow-lg border-x border-[#E6E9ED]">
+
+    <!-- Top Bar / Breadcrumb -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-[#E6E9ED] px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <a aria-label="Kembali ke Jadwal Ruangan" class="w-9 h-9 flex items-center justify-center rounded-xl border border-[#E6E9ED] text-[#111d28] hover:bg-[#edf4ff]" href="s03-jadwal.html">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </a>
+        <nav aria-label="Breadcrumb" class="flex items-center gap-1 text-xs text-[#424751]">
+          <a href="s03-jadwal.html" class="hover:underline">Jadwal</a>
+          <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+          <span class="text-[#004788] font-bold">Detail Ruangan</span>
+        </nav>
+      </div>
+      <div class="w-8 h-8 rounded-lg bg-[#14325C] p-1 flex items-center justify-center">
+        <img src="../assets/logo-ub.png" alt="UB" class="w-full h-full object-contain"/>
+      </div>
+    </header>
+
+    <!-- Content Wrapper -->
+    <div class="flex-1 flex flex-col space-y-5 px-4 pt-3">
+
+      <!-- 1. Room Photo & Identity -->
+      <section class="space-y-3">
+        <div class="relative w-full h-48 rounded-2xl overflow-hidden border border-[#E6E9ED] shadow-xs bg-[#e3efff]">
+          <img id="room-photo" class="w-full h-full object-cover" alt="Foto Ruangan Kelas Universitas Brawijaya" src="https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=900&q=80"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/15"></div>
+          <div class="absolute top-3 left-3" id="room-status-pill"></div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between gap-2">
+            <h1 id="room-name" class="text-xl font-extrabold text-[#14325C] tracking-tight">Ruang Teori 1.2</h1>
+            <span id="room-code" class="px-2.5 py-0.5 rounded-lg text-xs bg-[#edf4ff] text-[#004788] font-bold border border-[#1F5FA8]/20">RT-102</span>
+          </div>
+          <p id="room-location" class="text-xs text-[#424751] flex items-center gap-1 mt-1">
+            <span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">location_on</span>
+            <span>Gedung Kuliah Bersama A • Lantai 1</span>
+          </p>
+        </div>
+      </section>
+
+      <!-- Maintenance Warning Banner (Shown automatically if room.status === 'maintenance') -->
+      <section class="hidden" id="maintenanceAlertSection">
+        <div class="w-full bg-[#FFF1E6] border-l-4 border-[#F2A35E] p-3.5 rounded-r-xl flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-[#F2A35E] text-[20px] shrink-0">build</span>
+          <div class="text-xs">
+            <h2 class="font-bold text-[#111d28]">Pemberitahuan Pemeliharaan Ruangan</h2>
+            <p id="maintenance-note-text" class="text-[#424751] mt-0.5 leading-relaxed">
+              Ruangan sedang dalam pemeliharaan berkala. Proses peminjaman baru dinonaktifkan sementara.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Spesifikasi Cepat 2x2 -->
+      <section class="space-y-2">
+        <h2 class="text-xs font-extrabold text-[#14325C] uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">tune</span>
+          Spesifikasi Ruangan
+        </h2>
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <div class="bg-[#F5F7FA] p-3 rounded-xl border border-[#E6E9ED]">
+            <span class="text-[11px] text-[#6B7785] block">Kapasitas Maksimal</span>
+            <p id="spec-capacity" class="text-sm font-bold text-[#111d28] mt-0.5">45 Kursi</p>
+          </div>
+          <div class="bg-[#F5F7FA] p-3 rounded-xl border border-[#E6E9ED]">
+            <span class="text-[11px] text-[#6B7785] block">Dimensi &amp; Tipe</span>
+            <p id="spec-dim" class="text-sm font-bold text-[#111d28] mt-0.5">64 m² • Kelas</p>
+          </div>
+          <div class="bg-[#F5F7FA] p-3 rounded-xl border border-[#E6E9ED]">
+            <span class="text-[11px] text-[#6B7785] block">Jam Operasional</span>
+            <p id="spec-hours" class="text-sm font-bold text-[#111d28] mt-0.5">07:00 - 17:00 WIB</p>
+          </div>
+          <div class="bg-[#F5F7FA] p-3 rounded-xl border border-[#E6E9ED]">
+            <span class="text-[11px] text-[#6B7785] block">Pengelola / PIC</span>
+            <p id="spec-pic" class="text-sm font-bold text-[#111d28] mt-0.5 truncate">Pak Hadi (Sarpras)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Fasilitas Tersedia -->
+      <section class="space-y-2">
+        <h2 class="text-xs font-extrabold text-[#14325C] uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">devices</span>
+          Fasilitas Tersedia
+        </h2>
+        <div id="room-facilities-list" class="bg-white rounded-xl border border-[#E6E9ED] divide-y divide-[#E6E9ED] text-xs"></div>
+      </section>
+
+      <!-- 4. Aturan Pakai & SOP -->
+      <section class="space-y-2">
+        <h2 class="text-xs font-extrabold text-[#14325C] uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">gavel</span>
+          Tata Tertib &amp; SOP Penggunaan
+        </h2>
+        <div class="bg-[#edf4ff]/60 rounded-xl border border-[#c2c6d3]/60 p-3.5 space-y-2 text-xs text-[#111d28]">
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[#1F5FA8] text-[16px] shrink-0 mt-0.5">task_alt</span>
+            <span>Wajib menjaga kebersihan dan mengembalikan susunan kursi seusai kegiatan.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[#D64550] text-[16px] shrink-0 mt-0.5">do_not_disturb_on</span>
+            <span>Dilarang merokok dan membawa makanan berat berbau tajam di dalam ruangan.</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[#1F5FA8] text-[16px] shrink-0 mt-0.5">power_settings_new</span>
+            <span>Pastikan mematikan proyektor, AC, dan lampu setelah selesai digunakan.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Pilih Slot Jadwal -->
+      <section class="space-y-2.5">
+        <h2 class="text-xs font-extrabold text-[#14325C] uppercase tracking-wider flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">calendar_month</span>
+          Pilih Slot Waktu Tersedia
+        </h2>
+        <div id="detail-slots-list" class="space-y-2"></div>
+      </section>
+
+    </div>
+
+    <!-- Sticky Bottom Action Bar -->
+    <footer class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto bg-white border-t border-[#E6E9ED] shadow-2xl z-50 p-4">
+      <div id="footerNormalContent" class="space-y-2.5">
+        <div class="flex items-center justify-between text-xs">
+          <div>
+            <span class="text-[#6B7785] text-[11px] block">Slot Waktu Terpilih:</span>
+            <span id="detail-selected-slot-label" class="font-bold text-[#14325C]">Kamis, 22 Okt 2026 • 10:20 - 12:00 WIB</span>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D8F1E4] text-[#2E9E6B]">Bebas Bentrok</span>
+        </div>
+        <button onclick="continueToForm()" type="button" class="w-full h-12 bg-[#1F5FA8] hover:bg-[#14325C] active:scale-[0.98] transition-all rounded-xl text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm">
+          <span>Ajukan Pinjam Ruangan Ini</span>
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </button>
+      </div>
+      <div id="footerMaintenanceContent" class="hidden">
+        <button disabled type="button" class="w-full h-12 bg-[#E6E9ED] text-[#6B7785] rounded-xl font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed">
+          <span class="material-symbols-outlined text-[18px]">block</span>
+          <span>Ruangan Sedang Maintenance</span>
+        </button>
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    let currentRoom = null;
+    let activeSlotTime = '10:20 - 12:00';
+
+    function renderDetailRoom() {
+      const params = new URLSearchParams(window.location.search);
+      const savedSlot = window.SIPRK.getSelectedSlot();
+      const roomId = params.get('room') || savedSlot.roomId || 'rt-102';
+      currentRoom = window.SIPRK.getRoomById(roomId);
+      activeSlotTime = `${savedSlot.startTime || '10:20'} - ${savedSlot.endTime || '12:00'}`;
+
+      document.getElementById('room-photo').src = currentRoom.photo;
+      document.getElementById('room-name').textContent = currentRoom.name;
+      document.getElementById('room-code').textContent = currentRoom.code;
+      document.getElementById('room-location').innerHTML = `<span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">location_on</span><span>${currentRoom.building} • ${currentRoom.floor}</span>`;
+      document.getElementById('spec-capacity').textContent = `${currentRoom.capacity} Kursi`;
+      document.getElementById('spec-dim').textContent = currentRoom.dimensions || '64 m² • Kelas';
+      document.getElementById('spec-hours').textContent = currentRoom.openHours || '07:00 - 17:00 WIB';
+      document.getElementById('spec-pic').textContent = currentRoom.pic || 'Admin Sarpras UB';
+
+      // Facilities
+      document.getElementById('room-facilities-list').innerHTML = (currentRoom.facilities || []).map(f => `
+        <div class="p-3 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-[#1F5FA8] text-[18px]">check_circle</span>
+            <span class="font-semibold text-[#111d28]">${f}</span>
+          </div>
+          <span class="text-[10px] font-bold text-[#2E9E6B] bg-[#D8F1E4] px-2 py-0.5 rounded-full">Siap Pakai</span>
+        </div>
+      `).join('');
+
+      const isMaint = currentRoom.status === 'maintenance';
+      const pill = document.getElementById('room-status-pill');
+      if (isMaint) {
+        pill.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#E6E9ED] text-[#424751] shadow-sm"><span class="material-symbols-outlined text-[15px]">build</span>Maintenance</span>`;
+        document.getElementById('maintenanceAlertSection').classList.remove('hidden');
+        document.getElementById('maintenance-note-text').textContent = currentRoom.maintenanceNote || 'Ruangan sedang dalam perbaikan sarana prasarana.';
+        document.getElementById('footerNormalContent').classList.add('hidden');
+        document.getElementById('footerMaintenanceContent').classList.remove('hidden');
+      } else {
+        pill.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#D8F1E4] text-[#2E9E6B] shadow-sm"><span class="material-symbols-outlined text-[15px]">check_circle</span>Tersedia</span>`;
+        document.getElementById('maintenanceAlertSection').classList.add('hidden');
+        document.getElementById('footerNormalContent').classList.remove('hidden');
+        document.getElementById('footerMaintenanceContent').classList.add('hidden');
+      }
+
+      renderSlotOptions();
+    }
+
+    function renderSlotOptions() {
+      const savedSlot = window.SIPRK.getSelectedSlot();
+      const dateLabel = savedSlot.dateFormatted || 'Kamis, 22 Okt 2026';
+      document.getElementById('detail-selected-slot-label').textContent = `${dateLabel} • ${activeSlotTime} WIB`;
+
+      const slotsCont = document.getElementById('detail-slots-list');
+      slotsCont.innerHTML = (currentRoom.slots || []).map(sl => {
+        if (sl.status === 'terpakai') {
+          return `
+            <div class="p-3 rounded-xl border border-[#D64550]/30 bg-[#F9DADD]/40 flex items-center justify-between text-xs">
+              <div>
+                <span class="font-bold text-[#D64550] block">${sl.time} WIB</span>
+                <span class="text-[11px] text-[#424751]">${sl.label}</span>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#F9DADD] text-[#D64550]">Terpakai</span>
+            </div>
+          `;
+        }
+        const selected = activeSlotTime === sl.time;
+        return `
+          <button onclick="pickDetailSlot('${sl.time}')" type="button" class="w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs transition-all ${selected ? 'border-2 border-[#1F5FA8] bg-[#edf4ff]' : 'border-[#2E9E6B]/40 bg-[#D8F1E4]/30 hover:bg-[#D8F1E4]/50'}">
+            <div>
+              <span class="font-bold text-[#14325C] block">${sl.time} WIB</span>
+              <span class="text-[11px] text-[#424751]">${selected ? 'Slot dipilih untuk pengajuan' : 'Slot kosong, ketuk untuk memilih'}</span>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold ${selected ? 'bg-[#1F5FA8] text-white' : 'bg-white text-[#2E9E6B] border border-[#2E9E6B]'}">
+              ${selected ? 'Terpilih ✓' : 'Pilih Slot'}
+            </span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function pickDetailSlot(timeStr) {
+      activeSlotTime = timeStr;
+      renderSlotOptions();
+    }
+
+    function continueToForm() {
+      const savedSlot = window.SIPRK.getSelectedSlot();
+      const parts = activeSlotTime.split(' - ');
+      window.SIPRK.setSelectedSlot({
+        roomId: currentRoom.id,
+        roomCode: currentRoom.code,
+        roomName: currentRoom.name,
+        building: `${currentRoom.building} • ${currentRoom.floor}`,
+        capacity: currentRoom.capacity,
+        date: savedSlot.date || '2026-10-22',
+        dateFormatted: savedSlot.dateFormatted || 'Kamis, 22 Okt 2026',
+        startTime: parts[0] || '10:20',
+        endTime: parts[1] || '12:00'
+      });
+      window.location.href = 's05-form-peminjaman.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await window.SIPRK.syncFromServer();
+      renderDetailRoom();
+    });
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

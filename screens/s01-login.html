@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>Masuk ke SIPRK — SSO Universitas Brawijaya</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #1B2733;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col justify-between relative shadow-[0_0_40px_rgba(20,50,92,0.15)] border-x border-[#c2c6d3]/60">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-40 flex justify-between items-center px-4 h-14 bg-white border-b border-[#E6E9ED] shadow-2xs">
+      <a href="../index.html" class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-[#14325C] p-1 flex items-center justify-center shadow-xs">
+          <img src="../assets/logo-ub.png" alt="Logo Universitas Brawijaya" class="w-full h-full object-contain"/>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-base font-extrabold text-[#14325C] tracking-tight leading-none">SIPRK</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FFF0C2] text-[#8C6000] border border-[#D4AF37]/40 leading-none">SSO UB</span>
+          </div>
+          <span class="text-[10px] font-medium text-[#6B7785] block mt-0.5">Universitas Brawijaya</span>
+        </div>
+      </a>
+      <button aria-label="Bantuan SSO" class="w-9 h-9 rounded-full flex items-center justify-center text-[#6B7785] hover:bg-[#edf4ff] active:scale-95 transition-all" onclick="openHelpModal()" type="button">
+        <span class="material-symbols-outlined text-[20px]">help</span>
+      </button>
+    </header>
+
+    <!-- Main Login Canvas -->
+    <main class="px-4 py-6 flex-1 flex flex-col justify-center space-y-4">
+
+      <!-- Campus Badge -->
+      <div class="text-center">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E6E9ED] text-[#14325C] shadow-2xs">
+          <img src="../assets/logo-ub.png" alt="UB" class="w-4 h-4 object-contain"/>
+          <span class="text-xs font-semibold">Portal Autentikasi Terpusat GAPURA &amp; SIAM UB</span>
+        </div>
+      </div>
+
+      <!-- Primary Login Surface Card -->
+      <div class="bg-white rounded-2xl border border-[#E6E9ED] shadow-sm overflow-hidden">
+        <!-- UB Institutional Header -->
+        <div class="bg-gradient-to-br from-[#14325C] via-[#1B4379] to-[#1F5FA8] p-5 text-white relative overflow-hidden">
+          <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[#D4AF37]/20 blur-xl pointer-events-none"></div>
+          <div class="flex items-center gap-3.5 relative z-10">
+            <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/25 p-1.5 flex items-center justify-center shrink-0 shadow-sm">
+              <img src="../assets/logo-ub.png" alt="Logo Universitas Brawijaya" class="w-full h-full object-contain"/>
+            </div>
+            <div>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D4AF37]/25 border border-[#D4AF37]/50 text-[#FFF0C2] text-[10px] font-semibold uppercase">
+                <span class="material-symbols-outlined text-[12px]">verified_user</span>
+                Single Sign-On (SSO)
+              </span>
+              <h1 class="text-xl font-extrabold tracking-tight mt-1">Masuk ke SIPRK UB</h1>
+              <p class="text-[11px] text-[#c5daff] mt-0.5">Sistem Informasi Peminjaman Ruang Kelas</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <div class="bg-[#edf4ff] rounded-xl p-3 border border-[#afcafd] flex items-start gap-2.5">
+            <span class="material-symbols-outlined text-[#1F5FA8] text-[18px] shrink-0 mt-0.5">info</span>
+            <p class="text-xs text-[#424751] leading-relaxed">
+              Masukkan <strong>Email UB</strong> (<code class="text-[#14325C] font-semibold">@student.ub.ac.id</code> / <code class="text-[#14325C] font-semibold">@ub.ac.id</code>) atau <strong>NIM / NIP</strong> beserta kata sandi SSO Anda.
+            </p>
+          </div>
+
+          <form id="sso-login-form" onsubmit="handleFormSubmit(event)" class="space-y-4" novalidate>
+            <!-- Email / NIM / NIP Input -->
+            <div>
+              <label for="input-sso-id" class="block text-xs font-bold text-[#1B2733] mb-1.5">
+                Email UB / NIM / NIP <span class="text-[#D64550]">*</span>
+              </label>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3.5 top-3 text-[#6B7785] text-[20px]">person</span>
+                <input id="input-sso-id" type="text" required autocomplete="username" placeholder="Contoh: rani@student.ub.ac.id atau NIM/NIP" class="w-full h-11 pl-11 pr-3 rounded-xl border border-[#c2c6d3] bg-white text-xs font-medium text-[#1B2733] placeholder:text-[#6B7785]/70 focus:outline-none focus:ring-2 focus:ring-[#1F5FA8] focus:border-[#1F5FA8]"/>
+              </div>
+            </div>
+
+            <!-- Password Input -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="input-sso-pass" class="block text-xs font-bold text-[#1B2733]">
+                  Kata Sandi SSO <span class="text-[#D64550]">*</span>
+                </label>
+                <button type="button" onclick="openHelpModal()" class="text-[11px] font-semibold text-[#1F5FA8] hover:underline">Lupa kata sandi?</button>
+              </div>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3.5 top-3 text-[#6B7785] text-[20px]">lock</span>
+                <input id="input-sso-pass" type="password" required autocomplete="current-password" placeholder="Masukkan kata sandi SSO" class="w-full h-11 pl-11 pr-10 rounded-xl border border-[#c2c6d3] bg-white text-xs font-medium text-[#1B2733] placeholder:text-[#6B7785]/70 focus:outline-none focus:ring-2 focus:ring-[#1F5FA8] focus:border-[#1F5FA8]"/>
+                <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-2.5 text-[#6B7785] hover:text-[#1F5FA8] p-0.5" title="Tampilkan Kata Sandi">
+                  <span id="pass-toggle-icon" class="material-symbols-outlined text-[20px]">visibility</span>
+                </button>
+              </div>
+
+              <!-- Inline Error Message -->
+              <div id="inline-auth-error" class="hidden mt-2 p-2.5 rounded-lg bg-[#F9DADD] border border-[#D64550]/40 flex items-start gap-2 text-[#D64550] text-[11px] font-medium" role="alert" aria-live="polite">
+                <span class="material-symbols-outlined text-[16px] shrink-0 mt-0.5">error</span>
+                <span id="inline-auth-error-text">Email/NIM/NIP atau kata sandi SSO tidak sesuai.</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input type="checkbox" checked class="w-4 h-4 rounded border-[#c2c6d3] text-[#1F5FA8] focus:ring-[#1F5FA8]"/>
+                <span class="text-xs text-[#424751]">Tetap masuk di perangkat ini</span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btn-sso-cta" class="w-full h-12 px-4 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] active:scale-[0.98] transition-all text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm">
+              <span class="material-symbols-outlined text-[20px]" id="btn-sso-icon">login</span>
+              <span id="btn-sso-label">Masuk dengan SSO Kampus</span>
+              <svg class="animate-spin h-4 w-4 text-white hidden" fill="none" id="btn-sso-spinner" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Helpdesk Button -->
+      <button onclick="openHelpModal()" type="button" class="w-full min-h-[44px] flex items-center justify-between p-3.5 rounded-xl bg-white border border-[#E6E9ED] text-left hover:bg-[#edf4ff] transition-colors shadow-2xs">
+        <div class="flex items-center gap-2.5">
+          <span class="material-symbols-outlined text-[#1F5FA8] text-[20px]">support_agent</span>
+          <span class="text-xs font-semibold text-[#1F5FA8]">Butuh bantuan masuk? Hubungi Helpdesk DTI UB</span>
+        </div>
+        <span class="material-symbols-outlined text-[#6B7785] text-[18px]">chevron_right</span>
+      </button>
+
+      <div class="text-center">
+        <a href="../index.html" class="inline-flex items-center gap-1 text-xs font-semibold text-[#6B7785] hover:text-[#14325C]">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          <span>Kembali ke Halaman Utama</span>
+        </a>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full bg-white border-t border-[#E6E9ED] py-3 px-4 text-center">
+      <p class="text-[10px] font-medium text-[#6B7785]">
+        © 2026 SIPRK Universitas Brawijaya • Direktorat Teknologi Informasi UB
+      </p>
+    </footer>
+
+    <!-- Modal: Helpdesk DTI UB -->
+    <div class="fixed inset-0 z-50 bg-[#14325C]/45 backdrop-blur-xs flex items-end justify-center p-0 hidden" id="modal-helpdesk">
+      <div class="w-full max-w-[430px] bg-white rounded-t-2xl border-t border-[#E6E9ED] p-5 shadow-2xl space-y-3">
+        <div class="flex items-center justify-between pb-2.5 border-b border-[#E6E9ED]">
+          <div class="flex items-center gap-2">
+            <img src="../assets/logo-ub.png" alt="UB" class="w-6 h-6 object-contain"/>
+            <h3 class="text-sm font-bold text-[#14325C]">Helpdesk Layanan SSO DTI UB</h3>
+          </div>
+          <button class="w-8 h-8 rounded-full flex items-center justify-center text-[#6B7785]" onclick="closeHelpModal()" type="button">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+        <p class="text-xs text-[#424751] leading-relaxed">
+          Jika mengalami kendala autentikasi SSO GAPURA/SIAM atau lupa kata sandi, silakan hubungi unit layanan TI Universitas Brawijaya:
+        </p>
+        <div class="bg-[#F5F7FA] p-3 rounded-xl border border-[#E6E9ED] space-y-2 text-xs">
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[17px] text-[#1F5FA8]">call</span> <span>Hotline DTI UB: (0341) 551611 ext 126</span></div>
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[17px] text-[#1F5FA8]">mail</span> <span>helpdesk-tik@ub.ac.id</span></div>
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[17px] text-[#2E9E6B]">schedule</span> <span>Senin – Jumat, 08:00 – 16:00 WIB</span></div>
+        </div>
+        <button class="w-full h-11 rounded-xl bg-[#1F5FA8] text-white font-bold text-xs" onclick="closeHelpModal()" type="button">
+          Mengerti
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function togglePasswordVisibility() {
+      const inp = document.getElementById('input-sso-pass');
+      const icon = document.getElementById('pass-toggle-icon');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        inp.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const idInput = document.getElementById('input-sso-id');
+      const passInput = document.getElementById('input-sso-pass');
+      const errBox = document.getElementById('inline-auth-error');
+      const errText = document.getElementById('inline-auth-error-text');
+
+      const identifier = (idInput.value || '').trim();
+      const password = passInput.value || '';
+
+      if (!identifier || !password) {
+        errText.textContent = 'Harap isi Email/NIM/NIP dan kata sandi SSO Anda.';
+        errBox.classList.remove('hidden');
+        return;
+      }
+
+      errBox.classList.add('hidden');
+      passInput.classList.remove('border-[#D64550]', 'ring-1', 'ring-[#D64550]');
+
+      const ctaBtn = document.getElementById('btn-sso-cta');
+      const ctaLabel = document.getElementById('btn-sso-label');
+      const ctaIcon = document.getElementById('btn-sso-icon');
+      const spinner = document.getElementById('btn-sso-spinner');
+
+      ctaBtn.disabled = true;
+      ctaIcon.classList.add('hidden');
+      spinner.classList.remove('hidden');
+      ctaLabel.textContent = 'Memverifikasi Akun SSO UB...';
+
+      const result = await window.SIPRK.loginWithCredentials(identifier, password);
+
+      if (!result.ok) {
+        ctaBtn.disabled = false;
+        ctaIcon.classList.remove('hidden');
+        spinner.classList.add('hidden');
+        ctaLabel.textContent = 'Masuk dengan SSO Kampus';
+        errText.textContent = result.message;
+        errBox.classList.remove('hidden');
+        passInput.classList.add('border-[#D64550]', 'ring-1', 'ring-[#D64550]');
+        return;
+      }
+
+      window.location.href = result.user.homeScreen || 's02-beranda.html';
+    }
+
+    function openHelpModal() {
+      document.getElementById('modal-helpdesk').classList.remove('hidden');
+    }
+
+    function closeHelpModal() {
+      document.getElementById('modal-helpdesk').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

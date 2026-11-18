@@ -1,0 +1,286 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>Peminjaman Saya — SIPRK Universitas Brawijaya</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #111d28;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-24 shadow-sm border-x border-[#E6E9ED]">
+
+    <!-- Top App Bar -->
+    <header class="w-full bg-white/95 backdrop-blur-sm shadow-2xs z-40 sticky top-0 border-b border-[#E6E9ED]">
+      <div class="flex items-center justify-between px-4 h-14">
+        <div class="flex items-center gap-2.5">
+          <a href="s02-beranda.html" class="w-9 h-9 rounded-xl bg-[#14325C] p-1 flex items-center justify-center shadow-xs">
+            <img src="../assets/logo-ub.png" alt="Logo UB" class="w-full h-full object-contain"/>
+          </a>
+          <div>
+            <h1 class="text-base font-extrabold text-[#004788] tracking-tight leading-none">SIPRK</h1>
+            <p class="text-[10px] text-[#6B7785] mt-0.5">Universitas Brawijaya</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button aria-label="Notifikasi" class="w-9 h-9 flex items-center justify-center rounded-full text-[#424751] hover:bg-[#edf4ff] relative">
+            <span class="material-symbols-outlined text-[22px]">notifications</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Page Title & Search -->
+      <div class="px-4 pb-3 pt-1 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg text-[#111d28] font-extrabold tracking-tight">Peminjaman Saya</h2>
+            <p class="text-xs text-[#6B7785]">Kelola status izin &amp; riwayat peminjaman ruangan</p>
+          </div>
+          <a href="s03-jadwal.html" class="px-3 py-1.5 rounded-xl bg-[#1F5FA8] text-white text-xs font-bold flex items-center gap-1 shadow-2xs">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            <span>Pinjam</span>
+          </a>
+        </div>
+
+        <div class="relative w-full">
+          <span class="material-symbols-outlined absolute left-3 top-2.5 text-[#6B7785] text-[20px]">search</span>
+          <input id="search-input" oninput="renderMyBookings()" placeholder="Cari kode, nama kegiatan, atau ruangan..." type="text" class="w-full h-10 pl-10 pr-4 bg-[#F5F7FA] text-xs text-[#111d28] border border-[#c2c6d3] rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1F5FA8]"/>
+        </div>
+      </div>
+
+      <!-- Status Filter Track -->
+      <nav id="status-tabs-container" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar px-4 pb-3 pt-0.5"></nav>
+    </header>
+
+    <!-- Main Cards List -->
+    <main id="cards-container" class="px-4 py-3 space-y-3 flex-1"></main>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 hidden bg-[#111d28] text-white px-4 py-2.5 rounded-xl text-xs font-medium shadow-lg flex items-center gap-2">
+      <span class="material-symbols-outlined text-[16px] text-[#84eeb4]">check_circle</span>
+      <span id="toast-message">Berhasil</span>
+    </div>
+
+    <!-- Role-Adaptive Bottom Nav -->
+    <nav id="siprk-bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto w-full z-50 flex justify-around items-center px-1 py-1 h-16 bg-white border-t border-[#E6E9ED] shadow-sm"></nav>
+  </div>
+
+  <script>
+    let currentFilter = 'all';
+
+    function renderTabs(bookings) {
+      const counts = {
+        all: bookings.length,
+        menunggu: bookings.filter(b => b.status === 'menunggu').length,
+        disetujui: bookings.filter(b => b.status === 'disetujui').length,
+        konflik: bookings.filter(b => b.status === 'konflik').length,
+        draf: bookings.filter(b => b.status === 'draf').length,
+        ditolak: bookings.filter(b => b.status === 'ditolak').length,
+        dibatalkan: bookings.filter(b => b.status === 'dibatalkan').length
+      };
+
+      const tabs = [
+        { key: 'all', label: 'Semua' },
+        { key: 'menunggu', label: 'Menunggu' },
+        { key: 'disetujui', label: 'Disetujui' },
+        { key: 'konflik', label: 'Konflik' },
+        { key: 'draf', label: 'Draf' },
+        { key: 'ditolak', label: 'Ditolak' },
+        { key: 'dibatalkan', label: 'Dibatalkan' }
+      ];
+
+      document.getElementById('status-tabs-container').innerHTML = tabs.map(t => {
+        const active = currentFilter === t.key;
+        return `
+          <button onclick="setFilter('${t.key}')" type="button" class="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${active ? 'bg-[#1F5FA8] text-white shadow-2xs' : 'bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED]'}">
+            <span>${t.label}</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${active ? 'bg-white/20 text-white' : 'bg-white text-[#14325C]'}">${counts[t.key] || 0}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setFilter(f) {
+      currentFilter = f;
+      renderMyBookings();
+    }
+
+    function renderMyBookings() {
+      const bookings = window.SIPRK.getUserBookings();
+      renderTabs(bookings);
+
+      const q = (document.getElementById('search-input').value || '').toLowerCase();
+      const filtered = bookings.filter(b => {
+        const matchSt = currentFilter === 'all' || b.status === currentFilter;
+        const matchQ = !q || b.title.toLowerCase().includes(q) || b.code.toLowerCase().includes(q) || b.roomName.toLowerCase().includes(q);
+        return matchSt && matchQ;
+      });
+
+      const cont = document.getElementById('cards-container');
+      if (filtered.length === 0) {
+        cont.innerHTML = `
+          <div class="bg-white rounded-2xl border border-[#E6E9ED] p-8 text-center space-y-2.5 mt-2">
+            <span class="material-symbols-outlined text-4xl text-[#6B7785]">folder_open</span>
+            <h3 class="text-sm font-bold text-[#14325C]">Tidak Ada Peminjaman</h3>
+            <p class="text-xs text-[#6B7785]">Belum ada pengajuan peminjaman pada filter status ini.</p>
+            <a href="s03-jadwal.html" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1F5FA8] text-white text-xs font-bold mt-1">
+              <span class="material-symbols-outlined text-[16px]">search</span>
+              <span>Cari &amp; Pinjam Ruangan</span>
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = filtered.map(b => {
+        let statusBadge = '';
+        if (b.status === 'disetujui') {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#D8F1E4] text-[#2E9E6B] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">check_circle</span>Disetujui</span>`;
+        } else if (b.status === 'konflik') {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF1E6] text-[#D46B1D] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">warning</span>Konflik</span>`;
+        } else if (b.status === 'ditolak') {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F9DADD] text-[#D64550] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">cancel</span>Ditolak</span>`;
+        } else if (b.status === 'draf') {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E6E9ED] text-[#424751] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">edit_document</span>Draf</span>`;
+        } else if (b.status === 'dibatalkan') {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#E6E9ED] text-[#6B7785] text-xs font-bold">Dibatalkan</span>`;
+        } else {
+          statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FFF0C2] text-[#8C6000] text-xs font-bold"><span class="material-symbols-outlined text-[14px]">schedule</span>Menunggu</span>`;
+        }
+
+        return `
+          <article class="bg-white rounded-2xl border border-[#E6E9ED] p-4 shadow-2xs space-y-2.5">
+            <div class="flex items-start justify-between gap-2 pb-2 border-b border-[#E6E9ED]">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs px-2 py-0.5 rounded bg-[#edf4ff] font-mono text-[#14325C] font-bold">${b.code}</span>
+                <button onclick="copyCode('${b.code}')" type="button" class="text-[#6B7785] hover:text-[#1F5FA8] p-0.5">
+                  <span class="material-symbols-outlined text-[15px]">content_copy</span>
+                </button>
+              </div>
+              ${statusBadge}
+            </div>
+
+            <div>
+              <p class="text-[11px] text-[#6B7785]">Diajukan: ${b.createdAt}</p>
+              <h3 class="text-sm text-[#111d28] font-extrabold leading-snug mt-0.5">${b.title}</h3>
+              <div class="mt-2 space-y-1 bg-[#F5F7FA] p-2.5 rounded-xl border border-[#E6E9ED] text-xs">
+                <div class="flex items-center gap-2 font-semibold text-[#14325C]">
+                  <span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">meeting_room</span>
+                  <span>${b.roomName} (${b.roomLocation})</span>
+                </div>
+                <div class="flex items-center gap-2 text-[#424751]">
+                  <span class="material-symbols-outlined text-[16px] text-[#1F5FA8]">event</span>
+                  <span>${b.dateFormatted} • ${b.startTime} - ${b.endTime} WIB</span>
+                </div>
+              </div>
+
+              ${b.status === 'ditolak' && b.rejectionReason ? `
+                <div class="mt-2 p-2.5 rounded-xl bg-[#F9DADD]/60 border border-[#D64550]/40 text-xs text-[#93000a]">
+                  <strong>Alasan Penolakan:</strong> ${b.rejectionReason}
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="pt-2 border-t border-[#E6E9ED] flex items-center justify-between gap-2">
+              ${b.status === 'draf' ? `
+                <button onclick="removeDraft('${b.id}')" type="button" class="px-3 py-2 rounded-xl text-[#D64550] hover:bg-[#F9DADD]/40 text-xs font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[16px]">delete</span> Hapus Draf
+                </button>
+                <a href="s05-form-peminjaman.html" class="px-3.5 py-2 rounded-xl bg-[#1F5FA8] text-white text-xs font-bold flex items-center gap-1">
+                  Lanjutkan <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                </a>
+              ` : b.status === 'ditolak' ? `
+                <a href="s03-jadwal.html" class="px-3 py-2 rounded-xl border border-[#c2c6d3] text-[#111d28] text-xs font-semibold">
+                  Cari Alternatif
+                </a>
+                <a href="s08-detail-peminjaman.html?id=${encodeURIComponent(b.id)}" class="px-3.5 py-2 rounded-xl bg-[#1F5FA8] text-white text-xs font-bold">
+                  Lihat Detail
+                </a>
+              ` : `
+                ${(b.status === 'menunggu' || b.status === 'disetujui') ? `
+                  <button onclick="cancelBookingItem('${b.id}', '${b.status}')" type="button" class="px-3 py-2 rounded-xl border border-[#D64550]/40 text-[#D64550] text-xs font-semibold">
+                    Batalkan
+                  </button>
+                ` : '<span></span>'}
+                <a href="s08-detail-peminjaman.html?id=${encodeURIComponent(b.id)}" class="px-3.5 py-2 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] text-white text-xs font-bold flex items-center gap-1">
+                  <span>${b.status === 'disetujui' ? 'Detail & E-Tiket' : 'Lihat Detail'}</span>
+                  <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+                </a>
+              `}
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function copyCode(code) {
+      navigator.clipboard?.writeText(code);
+      showToast(`Kode ${code} disalin!`);
+    }
+
+    async function removeDraft(id) {
+      if (!confirm(`Hapus draf pengajuan ${id}?`)) return;
+      await window.SIPRK.deleteBooking(id);
+      renderMyBookings();
+      showToast('Draf berhasil dihapus');
+    }
+
+    async function cancelBookingItem(id, status) {
+      let reason = 'Kegiatan dijadwalkan ulang';
+      if (status === 'disetujui') {
+        reason = prompt('Masukkan alasan pembatalan untuk ruangan yang telah disetujui (min. 10 karakter):', 'Acara diundur oleh panitia');
+        if (!reason || reason.trim().length < 10) {
+          alert('Alasan pembatalan wajib minimal 10 karakter.');
+          return;
+        }
+      } else {
+        if (!confirm(`Batalkan pengajuan ${id}?`)) return;
+      }
+
+      await window.SIPRK.updateBooking(id, {
+        status: 'dibatalkan',
+        historyEntry: {
+          status: 'Dibatalkan oleh Pemohon',
+          actor: window.SIPRK.getSession().name,
+          note: `Dibatalkan dengan alasan: ${reason}`
+        }
+      });
+      renderMyBookings();
+      showToast(`Pengajuan ${id} telah dibatalkan.`);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2500);
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await window.SIPRK.syncFromServer();
+      renderMyBookings();
+    });
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

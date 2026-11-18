@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>Konfirmasi Pengajuan Terkirim — SIPRK UB</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #1B2733;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 20px;
+      line-height: 1;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-8 shadow-lg border-x border-[#E6E9ED]">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full h-14 bg-white border-b border-[#E6E9ED] flex items-center justify-between px-4 sticky top-0 z-40">
+      <div class="flex items-center gap-2">
+        <img src="../assets/logo-ub.png" alt="Logo UB" class="w-7 h-7 object-contain"/>
+        <span class="font-extrabold text-base tracking-tight text-[#14325C]">SIPRK UB</span>
+      </div>
+      <a aria-label="Tutup dan kembali ke Beranda" class="w-10 h-10 flex items-center justify-center rounded-lg text-[#6B7785] hover:bg-[#F5F7FA]" href="s02-beranda.html">
+        <span class="material-symbols-outlined">close</span>
+      </a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-4 pt-4 flex flex-col">
+      <article class="bg-white rounded-2xl border border-[#E6E9ED] p-5 shadow-2xs flex flex-col">
+        <div class="flex justify-center mb-3">
+          <div class="w-14 h-14 rounded-full bg-[#D8F1E4] flex items-center justify-center text-[#2E9E6B]">
+            <span class="material-symbols-outlined" style="font-size: 32px;">check_circle</span>
+          </div>
+        </div>
+
+        <div class="text-center mb-5">
+          <h1 class="text-xl font-extrabold text-[#1B2733] tracking-tight">Pengajuan Terkirim</h1>
+          <p class="mt-1 text-xs text-[#6B7785]">
+            Permohonan Anda berhasil disimpan ke sistem dan sedang menunggu verifikasi Admin Sarpras.
+          </p>
+        </div>
+
+        <!-- Kode Pengajuan Box -->
+        <section class="bg-[#DCEBFA] border border-[#1F5FA8]/20 rounded-xl p-3.5 mb-4 flex items-center justify-between">
+          <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-[#1F5FA8] uppercase tracking-wider">Kode Pengajuan</span>
+            <span class="text-base font-extrabold text-[#14325C] font-mono mt-0.5" id="reservation-code">SIPRK-261019-0007</span>
+          </div>
+          <button onclick="copyReservationCode()" id="copy-btn" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white text-[#1F5FA8] rounded-lg border border-[#1F5FA8]/30 text-xs font-bold shadow-2xs">
+            <span class="material-symbols-outlined" id="copy-icon" style="font-size: 16px;">content_copy</span>
+            <span id="copy-text">Salin</span>
+          </button>
+        </section>
+
+        <!-- SLA Banner -->
+        <div class="bg-[#FFF0C2]/70 border border-[#C98A00]/30 rounded-xl p-3 mb-4 flex items-start gap-2.5">
+          <span class="material-symbols-outlined text-[#C98A00] shrink-0 mt-0.5">schedule</span>
+          <p class="text-xs leading-relaxed text-[#1B2733]">
+            <strong>Estimasi verifikasi:</strong> Target keputusan maksimal 1 hari kerja (sesuai SLA layanan operasional Sarpras UB).
+          </p>
+        </div>
+
+        <!-- Ringkasan Reservasi Real -->
+        <div class="border border-[#E6E9ED] rounded-xl p-3.5 bg-[#F5F7FA] space-y-3 text-xs">
+          <div class="flex items-center justify-between border-b border-[#E6E9ED] pb-2">
+            <span class="text-[11px] font-bold uppercase text-[#6B7785]">Rincian Reservasi</span>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FFF0C2] text-[#C98A00]">Menunggu Verifikasi</span>
+          </div>
+          <div>
+            <span class="text-[#6B7785] block">Ruangan &amp; Lokasi</span>
+            <span id="conf-room" class="font-bold text-[#14325C] text-sm block mt-0.5">Ruang Teori 1.2</span>
+            <span id="conf-loc" class="text-[11px] text-[#6B7785]">Gedung Kuliah Bersama A, Lantai 1</span>
+          </div>
+          <div>
+            <span class="text-[#6B7785] block">Jadwal Penggunaan</span>
+            <span id="conf-date" class="font-bold text-[#1B2733] block mt-0.5">Kamis, 22 Okt 2026</span>
+            <span id="conf-time" class="text-[#1F5FA8] font-semibold">10:20 - 12:00 WIB</span>
+          </div>
+          <div>
+            <span class="text-[#6B7785] block">Agenda Kegiatan</span>
+            <span id="conf-title" class="font-bold text-[#1B2733] block mt-0.5">Seminar Nasional BEM</span>
+          </div>
+          <div>
+            <span class="text-[#6B7785] block">Pemohon / Penanggung Jawab</span>
+            <span id="conf-pic" class="font-semibold text-[#1B2733] block mt-0.5">Rani Maharani</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Actions -->
+      <section class="mt-5 space-y-2.5">
+        <a id="btn-view-status" href="s08-detail-peminjaman.html" class="w-full h-12 bg-[#1F5FA8] hover:bg-[#14325C] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm">
+          <span class="material-symbols-outlined">inventory</span>
+          <span>Lihat Status &amp; Detail Pengajuan</span>
+        </a>
+        <a href="s03-jadwal.html" class="w-full h-12 bg-white hover:bg-[#DCEBFA]/40 border border-[#1F5FA8] text-[#1F5FA8] font-bold text-xs rounded-xl flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined">add_circle</span>
+          <span>Ajukan Ruangan Lain</span>
+        </a>
+        <div class="text-center pt-1">
+          <a href="s02-beranda.html" class="inline-flex items-center justify-center min-h-[40px] px-4 text-xs font-semibold text-[#6B7785] hover:text-[#14325C]">
+            Kembali ke Beranda
+          </a>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <script>
+    function copyReservationCode() {
+      const codeText = document.getElementById('reservation-code').innerText.trim();
+      navigator.clipboard?.writeText(codeText);
+      document.getElementById('copy-icon').innerText = 'check';
+      document.getElementById('copy-text').innerText = 'Tersalin!';
+      setTimeout(() => {
+        document.getElementById('copy-icon').innerText = 'content_copy';
+        document.getElementById('copy-text').innerText = 'Salin';
+      }, 2000);
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await window.SIPRK.syncFromServer();
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const b = window.SIPRK.getBookingById(id);
+      if (!b) return;
+
+      document.getElementById('reservation-code').textContent = b.code;
+      document.getElementById('conf-room').textContent = b.roomName;
+      document.getElementById('conf-loc').textContent = b.roomLocation;
+      document.getElementById('conf-date').textContent = b.dateFormatted;
+      document.getElementById('conf-time').textContent = `${b.startTime} - ${b.endTime} WIB`;
+      document.getElementById('conf-title').textContent = b.title;
+      document.getElementById('conf-pic').textContent = `${b.applicantName} (${b.applicantUnit})`;
+      document.getElementById('btn-view-status').href = `s08-detail-peminjaman.html?id=${encodeURIComponent(b.id)}`;
+    });
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

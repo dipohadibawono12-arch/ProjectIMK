@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>S11 — Admin: Data Ruangan (CRUD) | SIPRK Universitas Brawijaya</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #1B2733;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-24 shadow-[0_0_40px_rgba(20,50,92,0.15)] border-x border-[#c2c6d3]/60">
+
+    <!-- Top App Bar (Admin) -->
+    <header class="sticky top-0 z-40 bg-[#14325C] text-white px-4 h-14 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-white/10 p-1 border border-white/20 flex items-center justify-center">
+          <img src="../assets/logo-ub.png" alt="Logo UB" class="w-full h-full object-contain"/>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-base font-extrabold tracking-tight leading-none">SIPRK Admin</span>
+            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">SARPRAS</span>
+          </div>
+          <span class="text-[10px] text-[#c5daff] block mt-0.5">Universitas Brawijaya • S11</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1">
+        <button aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10">
+          <span class="material-symbols-outlined text-[21px]">notifications</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Page Title & Add Button -->
+    <div class="bg-white border-b border-[#E6E9ED] px-4 pt-3.5 pb-3 space-y-3">
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <h1 class="text-lg font-extrabold text-[#14325C] leading-tight">Master Data Ruangan</h1>
+          <p class="text-[11px] text-[#6B7785]">Kelola kapasitas, fasilitas &amp; status operasional (ADM-07)</p>
+        </div>
+        <button onclick="openRoomDrawer()" type="button" class="h-10 px-3.5 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] text-white text-xs font-bold flex items-center gap-1 shadow-xs shrink-0">
+          <span class="material-symbols-outlined text-[18px]">add</span>
+          <span>Tambah</span>
+        </button>
+      </div>
+
+      <!-- Search & Filter Chips -->
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-2.5 text-[#6B7785] text-[19px]">search</span>
+        <input id="room-search" oninput="renderRooms()" type="text" placeholder="Cari kode, nama ruangan, atau gedung..." class="w-full h-10 pl-9 pr-3 rounded-lg border border-[#c2c6d3] bg-[#F5F7FA] text-xs text-[#1B2733] focus:bg-white focus:ring-2 focus:ring-[#1F5FA8]"/>
+      </div>
+
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <button onclick="setRoomFilter('all')" id="rfilt-all" class="px-3 py-1 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white shrink-0">Semua (5)</button>
+        <button onclick="setRoomFilter('tersedia')" id="rfilt-tersedia" class="px-3 py-1 rounded-full text-xs font-medium bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED] shrink-0">Tersedia</button>
+        <button onclick="setRoomFilter('maintenance')" id="rfilt-maintenance" class="px-3 py-1 rounded-full text-xs font-medium bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED] shrink-0">Maintenance / Rusak</button>
+      </div>
+    </div>
+
+    <!-- Rooms Card List -->
+    <main id="rooms-list-container" class="flex-1 px-4 py-3 space-y-3">
+      <!-- Populated dynamically via JS -->
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- DRAWER FORM: TAMBAH / UBAH DATA RUANGAN (ADM-07)                    -->
+    <!-- =================================================================== -->
+    <div id="room-form-drawer" class="fixed inset-0 z-50 hidden bg-[#14325C]/50 backdrop-blur-xs flex items-end justify-center">
+      <div class="w-full max-w-[430px] bg-white rounded-t-2xl max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+        <div class="px-4 py-3.5 bg-[#14325C] text-white flex items-center justify-between">
+          <h2 id="drawer-form-title" class="text-sm font-bold">Tambah Ruangan Baru</h2>
+          <button onclick="closeRoomDrawer()" type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-white/80">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+        <form onsubmit="saveRoomForm(event)" class="p-4 overflow-y-auto space-y-3.5 text-xs flex-1">
+          <input type="hidden" id="edit-room-id"/>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block font-semibold text-[#1B2733] mb-1">Kode Ruangan *</label>
+              <input id="inp-room-code" type="text" required placeholder="Mis. RT-102" class="w-full h-10 px-3 rounded-lg border border-[#c2c6d3] text-xs"/>
+            </div>
+            <div>
+              <label class="block font-semibold text-[#1B2733] mb-1">Kapasitas (Kursi) *</label>
+              <input id="inp-room-cap" type="number" required min="10" max="500" value="40" class="w-full h-10 px-3 rounded-lg border border-[#c2c6d3] text-xs"/>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-[#1B2733] mb-1">Nama Ruangan Lengkap *</label>
+            <input id="inp-room-name" type="text" required placeholder="Mis. Ruang Teori 1.2" class="w-full h-10 px-3 rounded-lg border border-[#c2c6d3] text-xs"/>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div>
+              <label class="block font-semibold text-[#1B2733] mb-1">Gedung *</label>
+              <select id="inp-room-building" class="w-full h-10 px-2.5 rounded-lg border border-[#c2c6d3] text-xs">
+                <option value="GKB-A">Gedung Kuliah Bersama A</option>
+                <option value="FILKOM Gedung F">Gedung F FILKOM UB</option>
+                <option value="Gedung Dekanat">Gedung Dekanat UB</option>
+              </select>
+            </div>
+            <div>
+              <label class="block font-semibold text-[#1B2733] mb-1">Status Operasional *</label>
+              <select id="inp-room-status" class="w-full h-10 px-2.5 rounded-lg border border-[#c2c6d3] text-xs">
+                <option value="tersedia">Tersedia (Aktif)</option>
+                <option value="maintenance">Maintenance / Rusak</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-[#1B2733] mb-1.5">Fasilitas Tersedia</label>
+            <div class="grid grid-cols-2 gap-2 bg-[#F5F7FA] p-2.5 rounded-xl border border-[#E6E9ED]">
+              <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-[#1F5FA8]"/> <span>Proyektor HD</span></label>
+              <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-[#1F5FA8]"/> <span>AC Split / Sentral</span></label>
+              <label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-[#1F5FA8]"/> <span>Smartboard / TV</span></label>
+              <label class="flex items-center gap-2"><input type="checkbox" class="rounded text-[#1F5FA8]"/> <span>Sound / Mikrofon</span></label>
+            </div>
+          </div>
+          <div class="pt-2 grid grid-cols-2 gap-2.5">
+            <button type="button" onclick="closeRoomDrawer()" class="h-11 rounded-xl border border-[#c2c6d3] font-semibold text-[#424751]">Batal</button>
+            <button type="submit" class="h-11 rounded-xl bg-[#1F5FA8] text-white font-bold">Simpan Ruangan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL PROTEKSI HAPUS RUANGAN DENGAN PENGAJUAN AKTIF (ADM-07)        -->
+    <!-- =================================================================== -->
+    <div id="delete-blocked-modal" class="fixed inset-0 z-50 hidden bg-[#14325C]/50 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-sm rounded-2xl p-5 border border-[#E6E9ED] shadow-2xl space-y-3.5">
+        <div class="w-12 h-12 rounded-full bg-[#F9DADD] text-[#D64550] flex items-center justify-center mx-auto">
+          <span class="material-symbols-outlined text-[26px]">block</span>
+        </div>
+        <div class="text-center space-y-1">
+          <h3 class="text-sm font-bold text-[#14325C]">Penghapusan Ditolak Sistem (ADM-07)</h3>
+          <p class="text-xs text-[#424751] leading-relaxed">
+            Ruangan <strong id="blocked-room-name" class="text-[#D64550]">Ruang 1.2</strong> tidak dapat dihapus karena masih memiliki pengajuan peminjaman aktif berikut:
+          </p>
+        </div>
+        <div id="impacted-bookings-list" class="bg-[#FFF8F6] border border-[#F2A35E] rounded-xl p-3 space-y-2 text-xs">
+          <!-- Populated dynamically -->
+        </div>
+        <p class="text-[11px] text-[#6B7785] text-center">
+          Anda dapat mengubah status ruangan menjadi <strong>Maintenance</strong> untuk menutup pengajuan baru.
+        </p>
+        <button onclick="document.getElementById('delete-blocked-modal').classList.add('hidden')" type="button" class="w-full h-11 rounded-xl bg-[#1F5FA8] text-white font-bold text-xs">
+          Mengerti
+        </button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="room-toast" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 hidden bg-[#111d28] text-white px-4 py-2.5 rounded-xl text-xs font-medium shadow-lg">
+      <span id="room-toast-msg">Status ruangan diperbarui</span>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav id="siprk-bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40 h-16 bg-white border-t border-[#E6E9ED] shadow-[0_-2px_10px_rgba(20,50,92,0.06)] flex items-center justify-around px-1"></nav>
+  </div>
+
+  <script>
+    let activeRoomFilter = 'all';
+
+    function getActiveBookingsForRoom(roomId) {
+      const bookings = window.SIPRK ? window.SIPRK.getBookings() : [];
+      return bookings.filter(b => b.roomId === roomId && (b.status === 'pending' || b.status === 'disetujui' || b.status === 'konflik'));
+    }
+
+    function renderRooms() {
+      const roomsData = window.SIPRK ? window.SIPRK.getRooms() : [];
+      document.getElementById('rfilt-all').textContent = `Semua (${roomsData.length})`;
+
+      const q = (document.getElementById('room-search').value || '').toLowerCase();
+      const cont = document.getElementById('rooms-list-container');
+
+      const filtered = roomsData.filter(r => {
+        const matchStatus = (activeRoomFilter === 'all') || (r.status === activeRoomFilter);
+        const matchQ = !q || r.name.toLowerCase().includes(q) || r.code.toLowerCase().includes(q) || r.building.toLowerCase().includes(q);
+        return matchStatus && matchQ;
+      });
+
+      cont.innerHTML = filtered.map(r => {
+        const isAvail = r.status === 'tersedia';
+        const activeBookings = getActiveBookingsForRoom(r.id);
+        return `
+          <article class="bg-white rounded-xl border border-[#E6E9ED] p-4 shadow-2xs space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <span class="px-2 py-0.5 rounded bg-[#edf4ff] text-[#1F5FA8] font-mono text-[10px] font-bold">${r.code}</span>
+                  <h3 class="text-sm font-bold text-[#14325C]">${r.name}</h3>
+                </div>
+                <p class="text-[11px] text-[#6B7785] mt-0.5">${r.building} • ${r.floor || 'Lt. 1'} • Kapasitas: <strong class="text-[#1B2733]">${r.capacity} kursi</strong></p>
+              </div>
+              <button onclick="toggleRoomStatus('${r.id}')" type="button" class="px-2.5 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 ${isAvail ? 'bg-[#D8F1E4] text-[#2E9E6B]' : 'bg-[#E6E9ED] text-[#6B7785]'}">
+                <span class="material-symbols-outlined text-[13px]">${isAvail ? 'check_circle' : 'build'}</span>
+                <span>${isAvail ? 'Tersedia' : 'Maintenance'}</span>
+              </button>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 text-[10px] text-[#424751]">
+              ${(r.facilities || []).map(f => `<span class="px-2 py-0.5 rounded bg-[#F5F7FA] border border-[#E6E9ED]">${f}</span>`).join('')}
+            </div>
+
+            <div class="pt-2.5 border-t border-[#E6E9ED] flex items-center justify-between text-xs">
+              <span class="text-[11px] font-medium ${activeBookings.length > 0 ? 'text-[#1F5FA8]' : 'text-[#6B7785]'}">
+                ${activeBookings.length > 0 ? `${activeBookings.length} Pengajuan Aktif` : '0 Pengajuan Aktif'}
+              </span>
+              <div class="flex items-center gap-1.5">
+                <button onclick="toggleRoomStatus('${r.id}')" type="button" class="px-2.5 py-1.5 rounded-lg border border-[#c2c6d3] text-[#424751] hover:bg-[#F5F7FA] text-[11px] font-semibold">
+                  ${isAvail ? 'Set Maintenance' : 'Aktifkan'}
+                </button>
+                <button onclick="openRoomDrawer('${r.id}')" type="button" class="px-2.5 py-1.5 rounded-lg border border-[#1F5FA8] text-[#1F5FA8] hover:bg-[#DCEBFA]/40 text-[11px] font-semibold">
+                  Ubah
+                </button>
+                <button onclick="attemptDeleteRoom('${r.id}')" type="button" class="p-1.5 rounded-lg text-[#D64550] hover:bg-[#F9DADD]/50" title="Hapus Ruangan">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function setRoomFilter(f) {
+      activeRoomFilter = f;
+      ['all', 'tersedia', 'maintenance'].forEach(k => {
+        const btn = document.getElementById('rfilt-' + k);
+        btn.className = (k === f)
+          ? 'px-3 py-1 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white shrink-0'
+          : 'px-3 py-1 rounded-full text-xs font-medium bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED] shrink-0';
+      });
+      renderRooms();
+    }
+
+    async function toggleRoomStatus(id) {
+      const r = window.SIPRK.getRoomById(id);
+      if (!r) return;
+      const newStatus = (r.status === 'tersedia') ? 'maintenance' : 'tersedia';
+      await window.SIPRK.updateRoom(id, { status: newStatus });
+      renderRooms();
+      showToast(`Status ${r.name} diubah menjadi ${newStatus.toUpperCase()}`);
+    }
+
+    function openRoomDrawer(editId) {
+      const drawer = document.getElementById('room-form-drawer');
+      const title = document.getElementById('drawer-form-title');
+      if (editId) {
+        const r = window.SIPRK.getRoomById(editId);
+        if (r) {
+          title.textContent = 'Ubah Data Ruangan (' + r.code + ')';
+          document.getElementById('edit-room-id').value = r.id;
+          document.getElementById('inp-room-code').value = r.code;
+          document.getElementById('inp-room-name').value = r.name;
+          document.getElementById('inp-room-cap').value = r.capacity;
+          document.getElementById('inp-room-status').value = r.status;
+        }
+      } else {
+        title.textContent = 'Tambah Ruangan Baru';
+        document.getElementById('edit-room-id').value = '';
+        document.getElementById('inp-room-code').value = '';
+        document.getElementById('inp-room-name').value = '';
+        document.getElementById('inp-room-cap').value = 40;
+      }
+      drawer.classList.remove('hidden');
+    }
+
+    function closeRoomDrawer() {
+      document.getElementById('room-form-drawer').classList.add('hidden');
+    }
+
+    async function saveRoomForm(e) {
+      e.preventDefault();
+      const editId = document.getElementById('edit-room-id').value;
+      const code = document.getElementById('inp-room-code').value;
+      const name = document.getElementById('inp-room-name').value;
+      const cap = parseInt(document.getElementById('inp-room-cap').value) || 40;
+      const bld = document.getElementById('inp-room-building').value;
+      const st = document.getElementById('inp-room-status').value;
+
+      if (editId) {
+        await window.SIPRK.updateRoom(editId, {
+          code,
+          name,
+          capacity: cap,
+          building: bld,
+          status: st
+        });
+        showToast('Data ruangan berhasil diperbarui');
+      } else {
+        await window.SIPRK.addRoom({
+          code,
+          name,
+          building: bld,
+          floor: 'Lantai 1',
+          capacity: cap,
+          status: st,
+          facilities: ['Proyektor HD', 'AC Split', 'Wi-Fi']
+        });
+        showToast('Ruangan baru berhasil ditambahkan');
+      }
+      closeRoomDrawer();
+      renderRooms();
+    }
+
+    async function attemptDeleteRoom(id) {
+      const r = window.SIPRK.getRoomById(id);
+      if (!r) return;
+      const activeBookings = getActiveBookingsForRoom(id);
+
+      // ADM-07: Ruangan dengan pengajuan aktif tidak dapat dihapus
+      if (activeBookings.length > 0) {
+        document.getElementById('blocked-room-name').textContent = `${r.name} (${r.code})`;
+        document.getElementById('impacted-bookings-list').innerHTML = activeBookings.map(b => `
+          <div class="flex items-start gap-2">
+            <span class="material-symbols-outlined text-[#D46B1D] text-[16px] mt-0.5">event_busy</span>
+            <div>
+              <p class="font-mono font-bold text-[#14325C] text-[10px]">${b.id}</p>
+              <p class="text-[#1B2733] font-medium">${b.title} (${b.dateLabel} ${b.startTime})</p>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('delete-blocked-modal').classList.remove('hidden');
+        return;
+      }
+
+      if (confirm(`Hapus ${r.name} (${r.code}) dari master ruangan?`)) {
+        const res = await window.SIPRK.deleteRoom(id);
+        if (res && res.ok) {
+          renderRooms();
+          showToast(`Ruangan ${r.code} berhasil dihapus`);
+        }
+      }
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('room-toast');
+      document.getElementById('room-toast-msg').textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2800);
+    }
+
+    window.addEventListener('DOMContentLoaded', renderRooms);
+    window.addEventListener('siprk:db-synced', renderRooms);
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

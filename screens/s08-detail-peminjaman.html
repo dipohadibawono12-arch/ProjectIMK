@@ -1,0 +1,321 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>Detail Peminjaman &amp; Riwayat Status — SIPRK UB</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #111d28;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-28 shadow-sm border-x border-[#E6E9ED]">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white border-b border-[#E6E9ED] px-4 h-14 flex items-center justify-between shadow-2xs">
+      <div class="flex items-center gap-2.5">
+        <a href="s07-peminjaman-saya.html" class="w-9 h-9 rounded-xl border border-[#E6E9ED] flex items-center justify-center text-[#111d28] hover:bg-[#edf4ff]">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </a>
+        <div>
+          <span class="text-[10px] text-[#6B7785] block leading-none">Peminjaman Saya</span>
+          <h1 class="text-sm font-extrabold text-[#14325C] mt-0.5">Detail Peminjaman</h1>
+        </div>
+      </div>
+      <div class="w-8 h-8 rounded-lg bg-[#14325C] p-1 flex items-center justify-center">
+        <img src="../assets/logo-ub.png" alt="UB" class="w-full h-full object-contain"/>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-4 pt-4 space-y-4 flex-1">
+
+      <!-- 1. Hero Card -->
+      <section class="bg-white rounded-2xl p-4 border border-[#E6E9ED] shadow-2xs space-y-3">
+        <h2 id="det-title" class="text-base font-extrabold text-[#14325C]">Seminar Nasional BEM</h2>
+
+        <div class="flex items-center justify-between bg-[#edf4ff] px-3 py-2 rounded-xl border border-[#afcafd]">
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-[#424751] uppercase font-bold">No. Pengajuan</span>
+            <code id="det-code" class="text-xs font-extrabold text-[#004788]">SIPRK-261019-0007</code>
+          </div>
+          <button onclick="copyDetCode()" type="button" class="px-2.5 py-1 bg-white border border-[#c2c6d3] rounded-lg text-[11px] font-bold text-[#1F5FA8]">
+            Salin
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <div id="det-status-chip"></div>
+          <span class="text-[11px] text-[#6B7785]" id="det-created">Diajukan 19 Okt 2026</span>
+        </div>
+      </section>
+
+      <!-- 2. Conditional Status Banner -->
+      <section id="det-banner-box"></section>
+
+      <!-- 3. Rincian Reservasi -->
+      <section class="bg-white rounded-2xl p-4 border border-[#E6E9ED] shadow-2xs space-y-3 text-xs">
+        <h3 class="font-extrabold text-[#14325C] border-b border-[#E6E9ED] pb-2 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[#1F5FA8] text-[18px]">meeting_room</span>
+          <span>Rincian Reservasi Ruangan</span>
+        </h3>
+        <div class="space-y-2.5">
+          <div>
+            <span class="text-[#6B7785] block text-[11px]">Ruangan &amp; Lokasi</span>
+            <span id="det-room" class="font-bold text-[#111d28] text-sm block">Ruang Teori 1.2</span>
+            <span id="det-loc" class="text-[#424751]">Gedung Kuliah Bersama A, Lantai 1</span>
+          </div>
+          <div>
+            <span class="text-[#6B7785] block text-[11px]">Waktu Pelaksanaan</span>
+            <span id="det-date" class="font-bold text-[#111d28] block">Kamis, 22 Okt 2026</span>
+            <span id="det-time" class="text-[#1F5FA8] font-bold">10:20 - 12:00 WIB</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#E6E9ED]">
+            <div>
+              <span class="text-[#6B7785] block text-[11px]">Kategori</span>
+              <span id="det-cat" class="font-bold text-[#111d28]">Kegiatan Ormawa</span>
+            </div>
+            <div>
+              <span class="text-[#6B7785] block text-[11px]">Jumlah Peserta</span>
+              <span id="det-part" class="font-bold text-[#111d28]">40 Orang</span>
+            </div>
+          </div>
+          <div class="pt-2 border-t border-[#E6E9ED]">
+            <span class="text-[#6B7785] block text-[11px]">Penanggung Jawab (PIC)</span>
+            <span id="det-pic" class="font-bold text-[#111d28] block">Rani Maharani</span>
+            <span id="det-contact" class="text-[#424751]">0812-3456-7890 • rani@student.ub.ac.id</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Dokumen Pengajuan -->
+      <section class="bg-white rounded-2xl p-4 border border-[#E6E9ED] shadow-2xs space-y-2.5 text-xs">
+        <h3 class="font-extrabold text-[#14325C] flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[#1F5FA8] text-[18px]">folder_open</span>
+          <span>Dokumen Lampiran</span>
+        </h3>
+        <div class="p-3 rounded-xl border border-[#E6E9ED] bg-[#F5F7FA] flex items-center justify-between">
+          <div class="flex items-center gap-2.5 truncate">
+            <span class="material-symbols-outlined text-[#D64550] text-[22px]">picture_as_pdf</span>
+            <div class="truncate">
+              <p id="det-doc-name" class="font-bold text-[#111d28] truncate">Proposal_Semnas_BEM.pdf</p>
+              <p id="det-doc-size" class="text-[10px] text-[#6B7785]">PDF • 2.4 MB</p>
+            </div>
+          </div>
+          <span class="px-2 py-0.5 rounded bg-[#D8F1E4] text-[#2E9E6B] text-[10px] font-bold">Terlampir</span>
+        </div>
+      </section>
+
+      <!-- 5. Timeline Riwayat Status (STS-02) -->
+      <section class="bg-white rounded-2xl p-4 border border-[#E6E9ED] shadow-2xs space-y-3 text-xs">
+        <h3 class="font-extrabold text-[#14325C] border-b border-[#E6E9ED] pb-2 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[#1F5FA8] text-[18px]">history</span>
+          <span>Riwayat Perubahan Status</span>
+        </h3>
+        <div id="det-timeline" class="relative pl-5 space-y-4 pt-1"></div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Sticky Action Bar -->
+    <aside id="det-bottom-actions" class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40 bg-white border-t border-[#E6E9ED] px-4 py-3 shadow-lg"></aside>
+
+    <!-- Modal E-Tiket QR Code -->
+    <div id="modal-ticket" class="fixed inset-0 z-50 hidden bg-[#14325C]/50 backdrop-blur-xs flex items-end justify-center">
+      <div class="bg-white w-full max-w-[430px] rounded-t-2xl p-5 border-t border-[#E6E9ED] shadow-2xl space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-[#E6E9ED]">
+          <div>
+            <span class="text-[10px] text-[#1F5FA8] font-bold uppercase">SIPRK Universitas Brawijaya</span>
+            <h3 class="text-sm font-extrabold text-[#14325C]">E-Tiket Izin Akses Ruangan</h3>
+          </div>
+          <button onclick="document.getElementById('modal-ticket').classList.add('hidden')" type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-[#6B7785]">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="p-4 bg-[#edf4ff] rounded-2xl border border-dashed border-[#1F5FA8]/40 text-center space-y-2">
+          <div class="w-40 h-40 mx-auto bg-white p-2 rounded-xl border border-[#E6E9ED] flex flex-col items-center justify-center shadow-inner">
+            <span class="material-symbols-outlined text-[104px] text-[#14325C]">qr_code_2</span>
+            <span id="qr-code-text" class="text-[10px] font-mono font-bold text-[#1F5FA8]">SIPRK-AUTH</span>
+          </div>
+          <p class="text-xs font-bold text-[#14325C]">Tunjukkan kepada Petugas Sarpras Gedung</p>
+          <p id="qr-room-info" class="text-[11px] text-[#424751]">Ruang Teori 2.1 • Disetujui Resmi</p>
+        </div>
+        <button onclick="document.getElementById('modal-ticket').classList.add('hidden')" type="button" class="w-full h-11 rounded-xl bg-[#1F5FA8] text-white font-bold text-xs">
+          Selesai
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let activeBooking = null;
+
+    function renderBookingDetail() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      activeBooking = window.SIPRK.getBookingById(id);
+      if (!activeBooking) return;
+
+      document.getElementById('det-title').textContent = activeBooking.title;
+      document.getElementById('det-code').textContent = activeBooking.code;
+      document.getElementById('det-created').textContent = activeBooking.createdAt;
+      document.getElementById('det-room').textContent = activeBooking.roomName;
+      document.getElementById('det-loc').textContent = activeBooking.roomLocation;
+      document.getElementById('det-date').textContent = activeBooking.dateFormatted;
+      document.getElementById('det-time').textContent = `${activeBooking.startTime} - ${activeBooking.endTime} WIB`;
+      document.getElementById('det-cat').textContent = activeBooking.category;
+      document.getElementById('det-part').textContent = `${activeBooking.participants} Orang (Maks ${activeBooking.capacity})`;
+      document.getElementById('det-pic').textContent = `${activeBooking.applicantName} (${activeBooking.applicantUnit})`;
+      document.getElementById('det-contact').textContent = `${activeBooking.applicantPhone} • ${activeBooking.applicantEmail}`;
+      document.getElementById('det-doc-name').textContent = activeBooking.documentName || 'Berkas_Pendukung.pdf';
+      document.getElementById('det-doc-size').textContent = `PDF • ${activeBooking.documentSize || '1.8 MB'}`;
+
+      const chipBox = document.getElementById('det-status-chip');
+      const bannerBox = document.getElementById('det-banner-box');
+      const actionsBox = document.getElementById('det-bottom-actions');
+
+      if (activeBooking.status === 'disetujui') {
+        chipBox.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-[#D8F1E4] text-[#2E9E6B]"><span class="material-symbols-outlined text-[15px]">check_circle</span>Disetujui Sarpras</span>`;
+        bannerBox.innerHTML = `
+          <div class="bg-[#D8F1E4] border-l-4 border-[#2E9E6B] p-3.5 rounded-r-xl text-xs space-y-1">
+            <p class="font-bold text-[#005233]">Peminjaman Disetujui</p>
+            <p class="text-[#111d28]">Izin pemakaian ruangan telah diterbitkan. Gunakan E-Tiket QR Code di bawah saat hari pelaksanaan.</p>
+          </div>
+        `;
+        actionsBox.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <button onclick="cancelThisBooking()" type="button" class="h-11 px-3.5 rounded-xl border border-[#D64550] text-[#D64550] font-bold text-xs">Batalkan</button>
+            <button onclick="openQrModal()" type="button" class="flex-1 h-11 px-4 rounded-xl bg-[#2E9E6B] text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs">
+              <span class="material-symbols-outlined text-[18px]">qr_code_2</span>
+              <span>Lihat E-Tiket &amp; QR Akses</span>
+            </button>
+          </div>
+        `;
+      } else if (activeBooking.status === 'ditolak') {
+        chipBox.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-[#F9DADD] text-[#D64550]"><span class="material-symbols-outlined text-[15px]">cancel</span>Permohonan Ditolak</span>`;
+        bannerBox.innerHTML = `
+          <div class="bg-[#F9DADD] border-l-4 border-[#D64550] p-3.5 rounded-r-xl text-xs space-y-1">
+            <p class="font-bold text-[#93000a]">Alasan Penolakan Admin Sarpras:</p>
+            <p class="text-[#111d28] italic">“${activeBooking.rejectionReason || 'Jadwal bertabrakan dengan kegiatan akademik rutin.'}”</p>
+          </div>
+        `;
+        actionsBox.innerHTML = `
+          <div class="grid grid-cols-2 gap-2.5">
+            <a href="s03-jadwal.html" class="h-11 rounded-xl border border-[#1F5FA8] text-[#1F5FA8] font-bold text-xs flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[17px]">search</span> Cari Alternatif
+            </a>
+            <a href="s05-form-peminjaman.html" class="h-11 rounded-xl bg-[#1F5FA8] text-white font-bold text-xs flex items-center justify-center gap-1">
+              <span class="material-symbols-outlined text-[17px]">refresh</span> Ajukan Ulang
+            </a>
+          </div>
+        `;
+      } else if (activeBooking.status === 'konflik') {
+        chipBox.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-[#FFF1E6] text-[#D46B1D]"><span class="material-symbols-outlined text-[15px]">warning</span>Konflik Jadwal</span>`;
+        bannerBox.innerHTML = `
+          <div class="bg-[#FFF1E6] border-l-4 border-[#F2A35E] p-3.5 rounded-r-xl text-xs space-y-1">
+            <p class="font-bold text-[#8C3F08]">Peringatan Konflik Jadwal</p>
+            <p class="text-[#111d28]">${activeBooking.conflictNote || 'Terdapat irisan jadwal pada slot yang dipilih.'}</p>
+          </div>
+        `;
+        actionsBox.innerHTML = `
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="cancelThisBooking()" type="button" class="h-11 rounded-xl border border-[#D64550] text-[#D64550] font-bold text-xs">Batalkan</button>
+            <a href="s03-jadwal.html" class="h-11 rounded-xl bg-[#D46B1D] text-white font-bold text-xs flex items-center justify-center gap-1">
+              Pilih Ruang Lain
+            </a>
+          </div>
+        `;
+      } else if (activeBooking.status === 'dibatalkan') {
+        chipBox.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-[#E6E9ED] text-[#424751]">Dibatalkan</span>`;
+        bannerBox.innerHTML = '';
+        actionsBox.innerHTML = `<a href="s03-jadwal.html" class="w-full h-11 rounded-xl bg-[#1F5FA8] text-white font-bold text-xs flex items-center justify-center">Buat Pengajuan Baru</a>`;
+      } else {
+        chipBox.innerHTML = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-[#FFF0C2] text-[#8C6000]"><span class="material-symbols-outlined text-[15px]">schedule</span>Menunggu Verifikasi</span>`;
+        bannerBox.innerHTML = `
+          <div class="bg-[#FFF0C2]/70 border-l-4 border-[#C98A00] p-3.5 rounded-r-xl text-xs space-y-1">
+            <p class="font-bold text-[#664600]">Dalam Antrean Verifikasi Sarpras</p>
+            <p class="text-[#111d28]">Pengajuan Anda sedang ditinjau oleh Admin Sarpras UB (Target keputusan ≤ 1 hari kerja).</p>
+          </div>
+        `;
+        actionsBox.innerHTML = `
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="cancelThisBooking()" type="button" class="h-11 rounded-xl border border-[#D64550] text-[#D64550] font-bold text-xs">Batalkan Pengajuan</button>
+            <a href="s07-peminjaman-saya.html" class="h-11 rounded-xl bg-[#1F5FA8] text-white font-bold text-xs flex items-center justify-center">Kembali ke Daftar</a>
+          </div>
+        `;
+      }
+
+      // Render Timeline
+      const hist = activeBooking.history || [];
+      document.getElementById('det-timeline').innerHTML = `
+        <div class="absolute left-2 top-2 bottom-2 w-0.5 bg-[#c2c6d3]"></div>
+        ${hist.map((h, i) => `
+          <div class="relative flex items-start gap-3">
+            <div class="absolute -left-5 top-0.5 w-4 h-4 rounded-full ${i === 0 ? 'bg-[#1F5FA8]' : 'bg-[#6B7785]'} ring-4 ring-white"></div>
+            <div class="flex-1 bg-[#F5F7FA] p-3 rounded-xl border border-[#E6E9ED]">
+              <div class="flex items-center justify-between text-[10px] text-[#6B7785] mb-0.5">
+                <span class="font-bold text-[#1F5FA8]">${i === 0 ? 'TERBARU' : 'RIWAYAT'}</span>
+                <span>${h.time}</span>
+              </div>
+              <p class="font-bold text-[#14325C] text-xs">${h.status}</p>
+              <p class="text-[11px] text-[#424751] mt-0.5">Aktor: <strong>${h.actor}</strong></p>
+              ${h.note ? `<p class="text-[11px] text-[#6B7785] mt-1">${h.note}</p>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function openQrModal() {
+      if (!activeBooking) return;
+      document.getElementById('qr-code-text').textContent = `${activeBooking.code}-UB-AUTH`;
+      document.getElementById('qr-room-info').textContent = `${activeBooking.roomName} • ${activeBooking.dateFormatted} (${activeBooking.startTime}-${activeBooking.endTime})`;
+      document.getElementById('modal-ticket').classList.remove('hidden');
+    }
+
+    async function cancelThisBooking() {
+      if (!activeBooking) return;
+      if (!confirm(`Batalkan pengajuan ${activeBooking.code}?`)) return;
+      await window.SIPRK.updateBooking(activeBooking.id, {
+        status: 'dibatalkan',
+        historyEntry: {
+          status: 'Dibatalkan oleh Pemohon',
+          actor: window.SIPRK.getSession().name,
+          note: 'Pengajuan dibatalkan melalui halaman detail peminjaman.'
+        }
+      });
+      renderBookingDetail();
+    }
+
+    function copyDetCode() {
+      if (!activeBooking) return;
+      navigator.clipboard?.writeText(activeBooking.code);
+      alert(`Kode ${activeBooking.code} berhasil disalin!`);
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await window.SIPRK.syncFromServer();
+      renderBookingDetail();
+    });
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

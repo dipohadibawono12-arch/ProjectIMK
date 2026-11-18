@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>S17 — Akses Dibatasi (403 / 404 / Offline) | SIPRK UB</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #1B2733;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col justify-between relative shadow-[0_0_40px_rgba(20,50,92,0.15)] border-x border-[#c2c6d3]/60">
+
+    <!-- Top App Bar -->
+    <header class="bg-white border-b border-[#E6E9ED] px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-[#14325C] p-1 flex items-center justify-center">
+          <img src="../assets/logo-ub.png" alt="UB" class="w-full h-full object-contain"/>
+        </div>
+        <div>
+          <span class="text-base font-extrabold text-[#14325C] leading-none">SIPRK UB</span>
+          <span class="text-[10px] text-[#6B7785] block mt-0.5">Proteksi Akses Peran (S17)</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Error Card -->
+    <main class="px-5 py-8 flex-1 flex flex-col justify-center">
+      <div class="bg-white rounded-2xl border border-[#E6E9ED] p-6 text-center shadow-sm space-y-4">
+        <div id="err-icon-box" class="w-16 h-16 rounded-full bg-[#F9DADD] text-[#D64550] flex items-center justify-center mx-auto">
+          <span id="err-icon" class="material-symbols-outlined text-4xl">gpp_maybe</span>
+        </div>
+        <div class="space-y-1.5">
+          <span id="err-code-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#F9DADD] text-[#D64550]">
+            ERROR 403 • AKSES DIBATASI (AUTH-03)
+          </span>
+          <h1 id="err-title" class="text-lg font-extrabold text-[#14325C] pt-1">
+            Halaman di Luar Hak Akses Peran Anda
+          </h1>
+          <p id="err-desc" class="text-xs text-[#6B7785] leading-relaxed">
+            Anda saat ini masuk sebagai <strong id="current-role-text" class="text-[#1B2733]">Mahasiswa</strong>. Sesuai aturan RBAC (AUTH-03), fitur ini hanya tersedia untuk peran pengguna yang berwenang.
+          </p>
+        </div>
+
+        <div class="pt-2 space-y-2.5">
+          <a id="btn-back-home" href="s02-beranda.html" class="w-full h-12 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs">
+            <span class="material-symbols-outlined text-[18px]">home</span>
+            <span>Kembali ke Beranda Saya</span>
+          </a>
+          <a href="s01-login.html" class="w-full h-11 rounded-xl border border-[#1F5FA8] text-[#1F5FA8] hover:bg-[#DCEBFA]/40 font-semibold text-xs flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">switch_account</span>
+            <span>Ganti Akun / Login Peran Lain</span>
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <footer class="py-3 text-center text-[10px] text-[#6B7785] bg-white border-t border-[#E6E9ED]">
+      SIPRK Universitas Brawijaya • Keamanan Berbasis Peran (RBAC)
+    </footer>
+  </div>
+
+  <script>
+    function setErrorType(type) {
+      ['403', '404', 'offline'].forEach(t => {
+        document.getElementById('ebtn-' + t).className = (t === type)
+          ? 'px-2 py-1 rounded text-[10px] font-bold bg-[#1F5FA8] text-white'
+          : 'px-2 py-1 rounded text-[10px] font-medium bg-[#F5F7FA] text-[#424751]';
+      });
+      const s = window.SIPRK.getSession();
+      const iconBox = document.getElementById('err-icon-box');
+      const icon = document.getElementById('err-icon');
+      const badge = document.getElementById('err-code-badge');
+      const title = document.getElementById('err-title');
+      const desc = document.getElementById('err-desc');
+
+      if (type === '403') {
+        iconBox.className = 'w-16 h-16 rounded-full bg-[#F9DADD] text-[#D64550] flex items-center justify-center mx-auto';
+        icon.textContent = 'gpp_maybe';
+        badge.textContent = 'ERROR 403 • AKSES DIBATASI (AUTH-03)';
+        title.textContent = 'Halaman di Luar Hak Akses Peran Anda';
+        desc.innerHTML = `Anda saat ini login sebagai <strong>${s.shortName} (${s.roleLabel})</strong>. Fitur tersebut tidak tersedia untuk peran Anda.`;
+      } else if (type === '404') {
+        iconBox.className = 'w-16 h-16 rounded-full bg-[#FFF0C2] text-[#C98A00] flex items-center justify-center mx-auto';
+        icon.textContent = 'find_in_page';
+        badge.textContent = 'ERROR 404 • TIDAK DITEMUKAN';
+        title.textContent = 'Halaman Tidak Ditemukan';
+        desc.textContent = 'Tautan atau halaman yang Anda tuju tidak tersedia atau telah dipindahkan.';
+      } else {
+        iconBox.className = 'w-16 h-16 rounded-full bg-[#FFF1E6] text-[#D46B1D] flex items-center justify-center mx-auto';
+        icon.textContent = 'wifi_off';
+        badge.textContent = 'OFFLINE • KONEKSI TERPUTUS';
+        title.textContent = 'Koneksi Jaringan Terputus';
+        desc.textContent = 'Data draf pengajuan Anda tetap tersimpan aman di perangkat. Periksa jaringan dan coba lagi.';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const s = window.SIPRK.getSession();
+      document.getElementById('current-role-text').textContent = `${s.shortName} (${s.roleLabel})`;
+      document.getElementById('btn-back-home').href = s.homeScreen;
+    });
+  </script>
+</body>
+</html>

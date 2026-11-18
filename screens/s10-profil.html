@@ -1,0 +1,467 @@
+﻿<!DOCTYPE html><html class="light" lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>S10 Profil Mahasiswa - SIPRK</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="../assets/siprk-session.js"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed-variant": "#005232",
+            "background": "#f7f9ff",
+            "tertiary": "#005233",
+            "outline-variant": "#c2c6d3",
+            "surface-bright": "#f7f9ff",
+            "on-primary-fixed": "#001c3b",
+            "surface": "#f7f9ff",
+            "on-tertiary": "#ffffff",
+            "primary": "#004788",
+            "surface-container-low": "#edf4ff",
+            "outline": "#727782",
+            "primary-fixed-dim": "#a7c8ff",
+            "surface-tint": "#1f5fa8",
+            "inverse-surface": "#26313e",
+            "inverse-primary": "#a7c8ff",
+            "secondary-container": "#afcafd",
+            "surface-container-lowest": "#ffffff",
+            "on-secondary-fixed": "#001b3e",
+            "tertiary-fixed": "#8df8bd",
+            "on-tertiary-container": "#84eeb4",
+            "error": "#ba1a1a",
+            "on-error-container": "#93000a",
+            "secondary-fixed": "#d6e3ff",
+            "on-background": "#111d28",
+            "tertiary-container": "#006d45",
+            "on-tertiary-fixed": "#002112",
+            "on-surface": "#111d28",
+            "on-error": "#ffffff",
+            "surface-container-highest": "#d7e4f4",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed-variant": "#004787",
+            "error-container": "#ffdad6",
+            "surface-container-high": "#dde9f9",
+            "tertiary-fixed-dim": "#71dba2",
+            "surface-dim": "#cfdbeb",
+            "on-secondary-container": "#3a5581",
+            "primary-container": "#1f5fa8",
+            "surface-variant": "#d7e4f4",
+            "surface-container": "#e3efff",
+            "on-surface-variant": "#424751",
+            "inverse-on-surface": "#e8f2ff",
+            "secondary": "#445f8b",
+            "on-secondary-fixed-variant": "#2c4772",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#adc7fa",
+            "primary-fixed": "#d5e3ff",
+            "on-primary-container": "#c5daff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-xl": "2rem",
+            "gutter": "1rem",
+            "space-md": "1rem",
+            "gutter-desktop": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.5rem"
+          },
+          "fontFamily": {
+            "headline-md-mobile": ["Inter"],
+            "label-sm": ["Inter"],
+            "headline-sm": ["Inter"],
+            "body-sm": ["Inter"],
+            "headline-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "headline-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "title-sm": ["Inter"],
+            "label-md": ["Inter"],
+            "label-lg": ["Inter"],
+            "title-md": ["Inter"],
+            "headline-lg-mobile": ["Inter"]
+          },
+          "fontSize": {
+            "headline-md-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+            "headline-sm": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+            "body-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+            "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "title-sm": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "label-md": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+            "label-lg": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+            "title-md": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}]
+          }
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.SIPRK) {
+        const s = window.SIPRK.getSession();
+        // Update Avatar, Name, Email, NIM/NIP, Prodi dynamically per active role
+        const avatarSpan = document.querySelector('.select-none');
+        if (avatarSpan) avatarSpan.textContent = s.avatar;
+
+        const nameEl = document.querySelector('h2.font-title-md');
+        if (nameEl) nameEl.textContent = s.name;
+
+        const emailEl = nameEl ? nameEl.nextElementSibling : null;
+        if (emailEl) emailEl.textContent = s.email;
+
+        const rolePill = document.querySelector('span.bg-\\[\\#D8F1E4\\].text-\\[\\#2E9E6B\\].font-medium');
+        if (rolePill) rolePill.textContent = s.roleLabel;
+
+        const gridBoxes = document.querySelectorAll('.grid.grid-cols-2.gap-2\\.5 > div');
+        if (gridBoxes.length >= 3) {
+          gridBoxes[0].innerHTML = `<span class="font-label-sm text-label-sm text-outline block">Nomor Induk (${s.idLabel})</span><span class="font-title-sm text-title-sm text-on-surface font-semibold tracking-wide">${s.idNumber}</span>`;
+          gridBoxes[1].innerHTML = `<span class="font-label-sm text-label-sm text-outline block">Status / Periode</span><span class="font-title-sm text-title-sm text-on-surface font-semibold">${s.semester}</span>`;
+          gridBoxes[2].innerHTML = `<span class="font-label-sm text-label-sm text-outline block">Unit / Program Studi &amp; Fakultas</span><span class="font-body-md text-body-md text-on-surface font-medium block leading-snug">${s.prodi}</span>`;
+        }
+      }
+    });
+  </script>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f7f9ff;
+      color: #111d28;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+</head>
+<body class="min-h-screen pb-24 antialiased selection:bg-primary selection:text-white">
+<!-- Mobile Viewport Wrapper (390px max-w centered for accurate mobile presentation) -->
+<div class="mx-auto max-w-[430px] min-h-screen bg-background relative flex flex-col shadow-sm">
+<!-- Top App Bar (Docked Full Width, No Bottom Border per Shell Border Ban) -->
+<header class="sticky top-0 z-40 w-full h-14 bg-surface-container-lowest px-4 flex items-center justify-between shadow-[0_2px_8px_rgba(27,39,51,0.04)]">
+<div class="flex items-center space-x-2.5">
+<a href="../index.html" class="w-9 h-9 rounded-lg bg-[#14325C] p-1 flex items-center justify-center shadow-xs">
+  <img src="../assets/logo-ub.png" alt="Logo Universitas Brawijaya" class="w-full h-full object-contain"/>
+</a>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">SIPRK</span>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#D8F1E4] text-[#2E9E6B] font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-[#2E9E6B] animate-pulse"></span>
+          SSO Terverifikasi
+        </span>
+<button aria-label="Bantuan Informasi" class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+</button>
+</div>
+</header>
+<!-- Main Scrollable Canvas -->
+<main class="flex-1 px-4 pt-3.5 pb-6 space-y-4">
+<!-- Page Title & Micro Context -->
+<div class="flex items-center justify-between px-0.5">
+<div>
+<h1 class="font-headline-md-mobile text-headline-md-mobile text-on-surface">Profil Akun</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manajemen identitas &amp; konfigurasi peminjaman</p>
+</div>
+<span class="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm">Akademik 2024/2025</span>
+</div>
+<!-- Kartu Identitas Akun Mahasiswa (Data Read-Only SSO) -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-4 space-y-4 shadow-[0_2px_4px_rgba(27,39,51,0.02)]">
+<!-- Header Profil + Avatar -->
+<div class="flex items-start gap-3.5">
+<div class="relative flex-shrink-0">
+<div class="w-16 h-16 rounded-full bg-primary/10 border-2 border-primary/20 flex items-center justify-center text-primary font-headline-sm text-headline-sm font-bold shadow-inner overflow-hidden">
+<span class="select-none">AFP</span>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-surface-container-lowest p-0.5 rounded-full shadow-sm">
+<span class="material-symbols-outlined text-[#2E9E6B] text-[18px] material-symbols-fill" title="SSO Verified">verified</span>
+</div>
+</div>
+<div class="flex-1 min-w-0 pt-0.5">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full bg-[#D8F1E4] text-[#2E9E6B] font-label-sm text-label-sm font-medium">
+                Mahasiswa Aktif
+              </span>
+<span class="font-label-sm text-label-sm text-outline flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[13px]">lock</span>
+                SSO ID
+              </span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface truncate mt-1">Ahmad Farhan Pratama</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">ahmad.farhan@student.ub.ac.id</p>
+</div>
+</div>
+<!-- Detail Data Akademik Grid -->
+<div class="grid grid-cols-2 gap-2.5 pt-2 border-t border-outline-variant/40">
+<div class="p-2.5 rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-outline block">Nomor Induk Mahasiswa (NIM)</span>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold tracking-wide">21040122140089</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-outline block">Tahun Angkatan</span>
+<span class="font-title-sm text-title-sm text-on-surface font-semibold">2021 (Semester 7)</span>
+</div>
+<div class="col-span-2 p-2.5 rounded-lg bg-surface-container-low">
+<span class="font-label-sm text-label-sm text-outline block">Program Studi &amp; Fakultas</span>
+<span class="font-body-md text-body-md text-on-surface font-medium block leading-snug">S1 Teknik Informatika - FILKOM Universitas Brawijaya</span>
+</div>
+</div>
+<!-- Banner Informasi Read-Only SSO -->
+<div class="rounded-lg bg-surface-container p-3 flex items-start gap-2.5 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[20px] flex-shrink-0 mt-0.5">lock_clock</span>
+<div class="font-body-sm text-body-sm space-y-1">
+<p class="font-medium text-on-surface">Data Profil Dikelola SSO Kampus</p>
+<p class="text-on-surface-variant leading-relaxed">
+              Data profil akun Anda disinkronkan otomatis dan dikelola melalui Single Sign-On (SSO) Kampus. Untuk perubahan identitas resmi, hubungi Biro Administrasi Akademik (BAA).
+            </p>
+</div>
+</div>
+<!-- Ringkasan Statistik Peminjaman (Bento 3 Kolom) -->
+<div>
+<span class="font-label-md text-label-md text-on-surface-variant block mb-2">Statistik Peminjaman Ruangan</span>
+<div class="grid grid-cols-3 gap-2">
+<!-- Stat 1 -->
+<div class="bg-surface-container-low p-2.5 rounded-lg text-center border border-outline-variant/30">
+<span class="font-headline-sm text-headline-sm text-primary font-bold block">3</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mt-0.5">Peminjaman Aktif</span>
+</div>
+<!-- Stat 2 -->
+<div class="bg-surface-container-low p-2.5 rounded-lg text-center border border-outline-variant/30">
+<span class="font-headline-sm text-headline-sm text-[#2E9E6B] font-bold block">12</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mt-0.5">Riwayat Selesai</span>
+</div>
+<!-- Stat 3 -->
+<div class="bg-surface-container-low p-2.5 rounded-lg text-center border border-outline-variant/30">
+<span class="font-headline-sm text-headline-sm text-outline font-bold block">0</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mt-0.5">Pelanggaran SOP</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Preferensi Notifikasi & Komunikasi -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-4 space-y-3.5 shadow-[0_2px_4px_rgba(27,39,51,0.02)]">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">Preferensi Notifikasi &amp; Pemberitahuan</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">
+            Atur saluran notifikasi untuk persetujuan ruangan, perubahan status draf, dan jadwal bentrok.
+          </p>
+</div>
+<div class="space-y-3 pt-1">
+<!-- Toggle 1: In-App Push -->
+<div class="flex items-start justify-between gap-3 p-3 rounded-lg bg-surface-container-low/60 border border-outline-variant/20">
+<div class="flex items-start gap-2.5 flex-1 pr-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">notifications_active</span>
+<div>
+<p class="font-title-sm text-title-sm text-on-surface">Notifikasi Aplikasi (In-App Push)</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Terima alert real-time persetujuan &amp; pengingat jadwal H-1.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1 flex-shrink-0">
+<input checked="" class="sr-only peer" onchange="this.setAttribute('aria-checked', this.checked)" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<!-- Toggle 2: Email Kampus -->
+<div class="flex items-start justify-between gap-3 p-3 rounded-lg bg-surface-container-low/60 border border-outline-variant/20">
+<div class="flex items-start gap-2.5 flex-1 pr-2">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">mark_email_read</span>
+<div>
+<p class="font-title-sm text-title-sm text-on-surface">Notifikasi Email Kampus</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Salinan bukti izin peminjaman digital dan e-tiket QR code.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1 flex-shrink-0">
+<input checked="" class="sr-only peer" onchange="this.setAttribute('aria-checked', this.checked)" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<!-- Toggle 3: SMS / WA Darurat -->
+<div class="flex items-start justify-between gap-3 p-3 rounded-lg bg-surface-container-low/60 border border-outline-variant/20">
+<div class="flex items-start gap-2.5 flex-1 pr-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mt-0.5">chat_bubble_outline</span>
+<div>
+<p class="font-title-sm text-title-sm text-on-surface">Pemberitahuan SMS / WhatsApp Darurat</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Hanya untuk informasi pembatalan mendesak oleh Sarpras.</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer mt-1 flex-shrink-0">
+<input class="sr-only peer" onchange="this.setAttribute('aria-checked', this.checked)" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Panduan & Dukungan Layanan -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/60 p-4 space-y-3 shadow-[0_2px_4px_rgba(27,39,51,0.02)]">
+<h2 class="font-title-md text-title-md text-on-surface">Panduan &amp; Dukungan Layanan</h2>
+<div class="divide-y divide-outline-variant/40">
+<!-- Item 1: SOP -->
+<a class="flex items-center justify-between py-3 group active:bg-surface-container-low transition-colors px-1 rounded-lg" href="#sop">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">description</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-on-surface">Panduan &amp; SOP Peminjaman Ruangan</p>
+<p class="font-body-sm text-body-sm text-outline">Prosedur reservasi dan alur disposisi BAA/Sarpras</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px] group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</a>
+<!-- Item 2: Sarpras GKB -->
+<a class="flex items-center justify-between py-3 group active:bg-surface-container-low transition-colors px-1 rounded-lg" href="#sarpras">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">support_agent</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-on-surface">Hubungi Layanan Sarpras GKB</p>
+<p class="font-body-sm text-body-sm text-outline">Meja bantuan teknis dan fasilitas ruang kelas</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px] group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</a>
+<!-- Item 3: S&K -->
+<a class="flex items-center justify-between py-3 group active:bg-surface-container-low transition-colors px-1 rounded-lg" href="#snk">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">verified_user</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm text-on-surface">Syarat &amp; Ketentuan Penggunaan Ruang</p>
+<p class="font-body-sm text-body-sm text-outline">Aturan ketertiban, kebersihan, dan sanksi</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline text-[20px] group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</a>
+</div>
+</section>
+<!-- Tombol Keluar Akun -->
+<div class="pt-2">
+<button class="w-full h-12 rounded-lg border border-[#D64550] bg-white text-[#D64550] font-title-sm text-title-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#F9DADD]/40 active:scale-[0.99] transition-all shadow-sm" onclick="openLogoutModal()" type="button">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+          Keluar Akun
+        </button>
+<p class="font-body-sm text-body-sm text-center text-outline mt-2">
+          SIPRK Mobile v2.4.0 • Universitas Brawijaya
+        </p>
+</div>
+</main>
+<!-- Modal Konfirmasi Logout -->
+<div class="fixed inset-0 z-50 hidden bg-[rgba(20,50,92,0.45)] backdrop-blur-[2px] items-end sm:items-center justify-center p-4 transition-opacity duration-200" id="logoutModal">
+<div class="bg-surface-container-lowest w-full max-w-sm rounded-xl p-5 border border-outline-variant space-y-4 shadow-[0_12px_32px_rgba(27,39,51,0.2)] animate-in fade-in zoom-in-95 duration-150">
+<div class="w-12 h-12 rounded-full bg-[#F9DADD] text-[#D64550] flex items-center justify-center mx-auto">
+<span class="material-symbols-outlined text-[26px]">logout</span>
+</div>
+<div class="text-center space-y-1.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Konfirmasi Keluar?</h3>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Sesi Anda di perangkat ini akan diakhiri. Pastikan pengajuan draf Anda telah tersimpan.
+          </p>
+</div>
+<div class="grid grid-cols-2 gap-2.5 pt-2">
+<button class="h-11 rounded-lg border border-outline-variant bg-white text-on-surface font-title-sm text-title-sm font-medium hover:bg-surface-container-low transition-colors" onclick="closeLogoutModal()" type="button">
+            Batal
+          </button>
+<button class="h-11 rounded-lg bg-[#D64550] text-white font-title-sm text-title-sm font-semibold hover:bg-[#b8323c] active:scale-95 transition-all shadow-sm" onclick="executeLogout()" type="button">
+            Ya, Keluar
+          </button>
+</div>
+</div>
+</div>
+<!-- Role-Adaptive Bottom Navigation Bar --><nav id="siprk-bottom-nav" class="fixed bottom-0 left-0 right-0 mx-auto max-w-[430px] w-full z-40 h-16 bg-surface-container-lowest/95 border-t border-outline-variant/30 shadow-[0_-4px_16px_rgba(27,39,51,0.06)] flex items-center justify-around px-1"></nav>
+</div>
+<!-- Inline Micro-interaction Script -->
+<script>
+    function openLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeLogoutModal() {
+      const modal = document.getElementById('logoutModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function executeLogout() {
+      // Feedback visual instan
+      const modal = document.getElementById('logoutModal');
+      modal.innerHTML = `
+        <div class="bg-surface-container-lowest w-full max-w-sm rounded-xl p-6 text-center space-y-3 shadow-xl">
+          <div class="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto"></div>
+          <p class="font-title-sm text-title-sm text-on-surface">Mengakhiri sesi SSO...</p>
+        </div>
+      `;
+      setTimeout(() => {
+        closeLogoutModal();
+        if (window.SIPRK) window.SIPRK.logout(); else window.location.href = 's01-login.html';
+      }, 1000);
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeLogoutModal();
+      }
+    });
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.SIPRK) {
+        const s = window.SIPRK.getSession();
+        // Update Avatar, Name, Email, NIM/NIP, Prodi dynamically per active role
+        const avatarSpan = document.querySelector('.select-none');
+        if (avatarSpan) avatarSpan.textContent = s.avatar;
+
+        const nameEl = document.querySelector('h2.font-title-md');
+        if (nameEl) nameEl.textContent = s.name;
+
+        const emailEl = nameEl ? nameEl.nextElementSibling : null;
+        if (emailEl) emailEl.textContent = s.email;
+
+        const rolePill = document.querySelector('span.bg-\\[\\#D8F1E4\\].text-\\[\\#2E9E6B\\].font-medium');
+        if (rolePill) rolePill.textContent = s.roleLabel;
+
+        const gridBoxes = document.querySelectorAll('.grid.grid-cols-2.gap-2\\.5 > div');
+        if (gridBoxes.length >= 3) {
+          gridBoxes[0].innerHTML = `<span class="font-label-sm text-label-sm text-outline block">Nomor Induk (${s.idLabel})</span><span class="font-title-sm text-title-sm text-on-surface font-semibold tracking-wide">${s.idNumber}</span>`;
+          gridBoxes[1].innerHTML = `<span class="font-label-sm text-label-sm text-outline block">Status / Periode</span><span class="font-title-sm text-title-sm text-on-surface font-semibold">${s.semester}</span>`;
+          gridBoxes[2].innerHTML = `<span class="font-label-sm text-label-sm text-outline block">Unit / Program Studi &amp; Fakultas</span><span class="font-body-md text-body-md text-on-surface font-medium block leading-snug">${s.prodi}</span>`;
+        }
+      }
+    });
+  </script>
+
+
+  <script src="../assets/siprk-nav.js"></script>
+</body></html>
+
+

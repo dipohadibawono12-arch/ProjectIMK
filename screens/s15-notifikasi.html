@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>S15 — Pusat Notifikasi | SIPRK Universitas Brawijaya</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #1B2733;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] min-h-screen bg-[#F5F7FA] flex flex-col relative pb-24 shadow-[0_0_40px_rgba(20,50,92,0.15)] border-x border-[#c2c6d3]/60">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-40 bg-white border-b border-[#E6E9ED] px-4 h-14 flex items-center justify-between shadow-2xs">
+      <div class="flex items-center gap-2.5">
+        <button onclick="history.back()" type="button" class="w-9 h-9 rounded-lg border border-[#E6E9ED] flex items-center justify-center text-[#1B2733] hover:bg-[#F5F7FA]">
+          <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="text-sm font-bold text-[#14325C] leading-tight">Pusat Notifikasi (S15)</h1>
+          <span id="notif-role-subtitle" class="text-[10px] text-[#6B7785] block">Memuat peran...</span>
+        </div>
+      </div>
+      <button onclick="markAllRead()" type="button" class="text-xs font-semibold text-[#1F5FA8] hover:underline">
+        Tandai Semua Dibaca
+      </button>
+    </header>
+
+    <!-- Filter Chips -->
+    <div class="bg-white border-b border-[#E6E9ED] px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-1.5">
+        <button onclick="setNotifFilter('all')" id="nfilt-all" class="px-3 py-1 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white">Semua</button>
+        <button onclick="setNotifFilter('unread')" id="nfilt-unread" class="px-3 py-1 rounded-full text-xs font-medium bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED]">Belum Dibaca</button>
+      </div>
+    </div>
+
+    <!-- Notifications List -->
+    <main id="notif-list" class="flex-1 px-4 py-3 space-y-2.5">
+      <!-- Populated dynamically per active role -->
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav id="siprk-bottom-nav" class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40 h-16 bg-white border-t border-[#E6E9ED] shadow-[0_-2px_10px_rgba(20,50,92,0.06)] flex items-center justify-around px-1"></nav>
+  </div>
+
+  <script>
+    let currentFilter = 'all';
+
+    function getNotifVisual(type) {
+      if (type === 'success') return { icon: 'check_circle', color: 'bg-[#D8F1E4] text-[#2E9E6B]' };
+      if (type === 'conflict' || type === 'warning') return { icon: 'warning', color: 'bg-[#FFF0C2] text-[#C98A00]' };
+      if (type === 'danger') return { icon: 'cancel', color: 'bg-[#F9DADD] text-[#D64550]' };
+      return { icon: 'notifications', color: 'bg-[#DCEBFA] text-[#1F5FA8]' };
+    }
+
+    function renderNotifs() {
+      const s = window.SIPRK.getSession();
+      document.getElementById('notif-role-subtitle').textContent = `${s.shortName} (${s.roleLabel})`;
+      const cont = document.getElementById('notif-list');
+      const allNotifs = window.SIPRK ? window.SIPRK.getNotifications(s.role) : [];
+      const list = allNotifs.filter(n => currentFilter === 'all' || n.unread);
+
+      if (list.length === 0) {
+        cont.innerHTML = `
+          <div class="bg-white rounded-2xl border border-[#E6E9ED] p-8 text-center space-y-2 mt-2">
+            <span class="material-symbols-outlined text-4xl text-[#6B7785]">notifications_off</span>
+            <h3 class="text-sm font-bold text-[#14325C]">Tidak Ada Notifikasi</h3>
+            <p class="text-xs text-[#6B7785]">Seluruh pemberitahuan status peminjaman akan muncul di sini.</p>
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = list.map(n => {
+        const vis = getNotifVisual(n.type);
+        return `
+          <a href="${n.link || '#'}" class="block rounded-xl border ${n.unread ? 'bg-[#edf4ff] border-[#1F5FA8]/40' : 'bg-white border-[#E6E9ED]'} p-3.5 shadow-2xs transition-all">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-full ${vis.color} flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[19px]">${vis.icon}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-2">
+                  <h3 class="text-xs font-bold text-[#14325C] truncate">${n.title}</h3>
+                  ${n.unread ? `<span class="w-2 h-2 rounded-full bg-[#1F5FA8] shrink-0"></span>` : ''}
+                </div>
+                <p class="text-[11px] text-[#424751] mt-1 leading-relaxed">${n.body}</p>
+                <span class="text-[10px] font-medium text-[#6B7785] block mt-1.5">${n.time}</span>
+              </div>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    function setNotifFilter(f) {
+      currentFilter = f;
+      document.getElementById('nfilt-all').className = f === 'all' ? 'px-3 py-1 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white' : 'px-3 py-1 rounded-full text-xs font-medium bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED]';
+      document.getElementById('nfilt-unread').className = f === 'unread' ? 'px-3 py-1 rounded-full text-xs font-semibold bg-[#1F5FA8] text-white' : 'px-3 py-1 rounded-full text-xs font-medium bg-[#F5F7FA] text-[#424751] border border-[#E6E9ED]';
+      renderNotifs();
+    }
+
+    async function markAllRead() {
+      const s = window.SIPRK.getSession();
+      await window.SIPRK.markAllNotificationsRead(s.role);
+      renderNotifs();
+    }
+
+    window.addEventListener('DOMContentLoaded', renderNotifs);
+    window.addEventListener('siprk:db-synced', renderNotifs);
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>

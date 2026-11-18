@@ -1,0 +1,10 @@
+{
+  "name": "siprk-universitas-brawijaya-mobile",
+  "version": "1.0.0",
+  "description": "Aplikasi Mobile Sistem Informasi Peminjaman dan Ketersediaan Ruangan Kelas (SIPRK) Universitas Brawijaya",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}

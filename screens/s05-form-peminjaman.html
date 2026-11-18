@@ -1,0 +1,510 @@
+﻿<!DOCTYPE html>
+<html class="light" lang="id">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>Ajukan Peminjaman Ruangan — SIPRK Universitas Brawijaya</title>
+  <link rel="icon" type="image/png" href="../assets/logo-ub.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="../assets/siprk-session.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #E6ECF5;
+      color: #111d28;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex justify-center bg-[#E6ECF5]">
+
+  <div class="w-full max-w-[430px] bg-[#F5F7FA] min-h-screen flex flex-col justify-between relative pb-28 shadow-lg border-x border-[#E6E9ED]">
+
+    <!-- Top App Bar -->
+    <header class="sticky top-0 z-40 bg-white px-4 h-14 flex items-center justify-between border-b border-[#E6E9ED]">
+      <div class="flex items-center gap-2">
+        <a href="s03-jadwal.html" class="w-9 h-9 rounded-lg flex items-center justify-center text-[#004788] hover:bg-[#edf4ff]">
+          <span class="material-symbols-outlined text-[22px]">arrow_back</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <img src="../assets/logo-ub.png" alt="Logo UB" class="w-6 h-6 object-contain"/>
+          <h1 class="text-sm font-extrabold text-[#14325C]">Ajukan Peminjaman</h1>
+        </div>
+      </div>
+      <button onclick="saveAsDraft()" type="button" class="px-2.5 py-1 bg-[#edf4ff] hover:bg-[#DCEBFA] rounded-full border border-[#1F5FA8]/30 text-[11px] font-semibold text-[#1F5FA8] flex items-center gap-1">
+        <span class="material-symbols-outlined text-[14px]">save</span>
+        <span>Simpan Draf</span>
+      </button>
+    </header>
+
+    <!-- Main Form Container -->
+    <main class="px-4 pt-3 flex-1 flex flex-col gap-3.5">
+
+      <!-- Stepper 4 Langkah (PNJ-01) -->
+      <section class="bg-white p-3 rounded-2xl border border-[#E6E9ED] shadow-2xs">
+        <div class="flex items-center justify-between relative">
+          <div class="absolute left-6 right-6 top-3.5 h-[2px] bg-[#E6E9ED] -z-0"></div>
+          <div class="absolute left-6 top-3.5 h-[2px] bg-[#2E9E6B] transition-all duration-300 -z-0" id="stepper-progress-line" style="width: 0%;"></div>
+
+          <button onclick="goToStep(1)" type="button" class="flex flex-col items-center gap-1 relative z-10">
+            <div id="step-badge-1" class="w-7 h-7 rounded-full bg-[#1F5FA8] text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">1</div>
+            <span id="step-label-1" class="text-[10px] font-bold text-[#1F5FA8]">Waktu</span>
+          </button>
+          <button onclick="goToStep(2)" type="button" class="flex flex-col items-center gap-1 relative z-10">
+            <div id="step-badge-2" class="w-7 h-7 rounded-full bg-[#E6E9ED] text-[#424751] flex items-center justify-center text-xs font-medium ring-2 ring-white">2</div>
+            <span id="step-label-2" class="text-[10px] font-medium text-[#424751]">Kegiatan</span>
+          </button>
+          <button onclick="goToStep(3)" type="button" class="flex flex-col items-center gap-1 relative z-10">
+            <div id="step-badge-3" class="w-7 h-7 rounded-full bg-[#E6E9ED] text-[#424751] flex items-center justify-center text-xs font-medium ring-2 ring-white">3</div>
+            <span id="step-label-3" class="text-[10px] font-medium text-[#424751]">Dokumen</span>
+          </button>
+          <button onclick="goToStep(4)" type="button" class="flex flex-col items-center gap-1 relative z-10">
+            <div id="step-badge-4" class="w-7 h-7 rounded-full bg-[#E6E9ED] text-[#424751] flex items-center justify-center text-xs font-medium ring-2 ring-white">4</div>
+            <span id="step-label-4" class="text-[10px] font-medium text-[#424751]">Tinjau</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Sticky Summary Card -->
+      <div class="bg-white border border-[#E6E9ED] rounded-2xl p-3.5 shadow-2xs space-y-2">
+        <div class="flex items-start justify-between">
+          <div>
+            <span id="summary-room-name" class="text-sm font-extrabold text-[#14325C]">Ruang Teori 1.2</span>
+            <p id="summary-room-loc" class="text-[11px] text-[#6B7785]">Gedung Kuliah Bersama A • Lt. 1</p>
+          </div>
+          <div id="room-status-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#D8F1E4] text-[#2E9E6B] flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">check_circle</span>
+            <span>Bebas Bentrok</span>
+          </div>
+        </div>
+        <div class="pt-2 border-t border-[#E6E9ED] flex items-center justify-between text-xs text-[#424751]">
+          <span id="summary-date-text" class="font-semibold text-[#111d28]">Kamis, 22 Okt 2026</span>
+          <span class="font-bold text-[#1F5FA8]" id="summary-time-text">10:20 - 12:00 WIB</span>
+          <span id="summary-cap-text" class="text-[11px] text-[#6B7785]">Maks. 45 Kursi</span>
+        </div>
+      </div>
+
+      <!-- Real Conflict Warning Banner (PNJ-04) -->
+      <div class="hidden bg-[#FFF1E6] border-l-4 border-[#F2A35E] p-3 rounded-r-xl text-xs" id="conflict-banner">
+        <div class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-[#D46B1D] text-[19px] shrink-0">warning</span>
+          <div>
+            <p class="font-bold text-[#8C3F08]">Jadwal Beririsan dengan Kuliah Reguler</p>
+            <p id="conflict-detail-text" class="text-[11px] text-[#111d28] mt-0.5">Ruangan terpakai pada jam tersebut. Silakan pilih jam alternatif.</p>
+            <button onclick="resolveConflictTime()" type="button" class="mt-2 px-2.5 py-1 bg-white text-[#1F5FA8] border border-[#1F5FA8] rounded-lg text-[11px] font-bold">
+              Gunakan Slot Kosong 13:00 - 15:00 WIB
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= STEP 1: RUANGAN & WAKTU ================= -->
+      <div id="step-content-1" class="bg-white border border-[#E6E9ED] rounded-2xl p-4 space-y-3.5 shadow-2xs">
+        <div class="p-3 bg-[#edf4ff] rounded-xl border border-[#afcafd] flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase text-[#6B7785] block">Pemohon Terautentikasi SSO UB:</span>
+            <span id="role-description" class="text-xs font-bold text-[#14325C]">Rani Maharani</span>
+          </div>
+          <span id="role-label" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#1F5FA8] text-white">Mahasiswa</span>
+        </div>
+
+        <div id="urgent-dosen-badge" class="hidden p-2.5 bg-[#D8F1E4] border border-[#2E9E6B]/30 rounded-xl text-xs text-[#005233] flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#2E9E6B] text-[18px]">bolt</span>
+          <span><strong>Prioritas Dosen (BR-01):</strong> Reservasi kelas pengganti H-0 diizinkan.</span>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#111d28] mb-1">Pilih Ruangan <span class="text-[#D64550]">*</span></label>
+          <select id="select-room" onchange="handleRoomOrTimeChange()" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]"></select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-bold text-[#111d28]">Tanggal Pemakaian <span class="text-[#D64550]">*</span></label>
+            <span id="date-rule-hint" class="text-[10px] font-semibold text-[#1F5FA8]">Minimal H-1 (BR-01)</span>
+          </div>
+          <input id="input-tanggal" type="date" value="2026-10-22" min="2026-10-20" onchange="handleRoomOrTimeChange()" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]"/>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-bold text-[#111d28] mb-1">Jam Mulai <span class="text-[#D64550]">*</span></label>
+            <select id="input-jam-mulai" onchange="handleRoomOrTimeChange()" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]">
+              <option value="07:00">07:00 WIB</option>
+              <option value="08:00">08:00 WIB (Cek Konflik)</option>
+              <option value="08:40">08:40 WIB</option>
+              <option value="10:20" selected>10:20 WIB</option>
+              <option value="13:00">13:00 WIB</option>
+              <option value="15:00">15:00 WIB</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#111d28] mb-1">Jam Selesai <span class="text-[#D64550]">*</span></label>
+            <select id="input-jam-selesai" onchange="handleRoomOrTimeChange()" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]">
+              <option value="08:40">08:40 WIB</option>
+              <option value="10:20">10:20 WIB</option>
+              <option value="12:00" selected>12:00 WIB</option>
+              <option value="14:40">14:40 WIB</option>
+              <option value="17:00">17:00 WIB</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= STEP 2: DETAIL KEGIATAN ================= -->
+      <div id="step-content-2" class="hidden bg-white border border-[#E6E9ED] rounded-2xl p-4 space-y-3.5 shadow-2xs">
+        <div>
+          <label class="block text-xs font-bold text-[#111d28] mb-1">Kategori Kegiatan <span class="text-[#D64550]">*</span></label>
+          <select id="select-jenis" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]">
+            <option value="Kegiatan Ormawa">Kegiatan Ormawa / BEM / HIMA</option>
+            <option value="Seminar Akademik">Seminar / Kuliah Tamu Akademik</option>
+            <option value="Diskusi Mahasiswa">Kelompok Belajar / Diskusi Mahasiswa</option>
+          </select>
+        </div>
+
+        <div id="dosen-matkul-container" class="hidden">
+          <label class="block text-xs font-bold text-[#111d28] mb-1">Pilih Mata Kuliah &amp; Kelas (PNJ-07) <span class="text-[#D64550]">*</span></label>
+          <select id="select-matkul-dosen" onchange="document.getElementById('input-nama-kegiatan').value = 'Kelas Pengganti: ' + this.value" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]">
+            <option value="IF2101 Algoritma & Struktur Data (IF-3A)">IF2101 Algoritma &amp; Struktur Data (IF-3A)</option>
+            <option value="IF3104 Rekayasa Perangkat Lunak (IF-4B)">IF3104 Rekayasa Perangkat Lunak (IF-4B)</option>
+            <option value="SI2204 Sistem Basis Data (SI-2A)">SI2204 Sistem Basis Data (SI-2A)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-[#111d28] mb-1">Nama Kegiatan Lengkap <span class="text-[#D64550]">*</span></label>
+          <input id="input-nama-kegiatan" type="text" required value="Rapat Koordinasi Panitia Seminar Nasional BEM" placeholder="Tuliskan nama kegiatan..." class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]"/>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-bold text-[#111d28] mb-1">Penanggung Jawab <span class="text-[#D64550]">*</span></label>
+            <input id="input-pic" type="text" required class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]"/>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#111d28] mb-1">No. WhatsApp <span class="text-[#D64550]">*</span></label>
+            <input id="input-kontak" type="tel" required value="0812-3456-7890" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]"/>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-bold text-[#111d28]">Jumlah Peserta <span class="text-[#D64550]">*</span></label>
+            <span id="max-cap-label" class="text-[10px] font-semibold text-[#6B7785]">Kapasitas Maks: 45 Orang</span>
+          </div>
+          <input id="input-peserta" type="number" min="1" max="300" value="35" oninput="validateCapacity()" class="w-full h-11 px-3 rounded-xl border border-[#c2c6d3] text-xs font-medium text-[#111d28]"/>
+          <div id="capacity-warning-box" class="hidden mt-2 p-2.5 bg-[#FFF0C2] border border-[#C98A00] rounded-xl text-[11px] text-[#111d28]">
+            ⚠️ <strong>Kapasitas Terlampaui (BR-09):</strong> Jumlah peserta melebihi kapasitas kursi ruangan ini. Disarankan memilih <strong>Auditorium Mini 1.1 (90 Kursi)</strong>.
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= STEP 3: UNGGAH DOKUMEN ================= -->
+      <div id="step-content-3" class="hidden bg-white border border-[#E6E9ED] rounded-2xl p-4 space-y-3.5 shadow-2xs">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-extrabold text-[#14325C]">Dokumen Pendukung (PNJ-03)</h2>
+          <span id="doc-mandatory-tag" class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FFF0C2] text-[#C98A00]">Wajib untuk Ormawa</span>
+        </div>
+
+        <label class="border-2 border-dashed border-[#1F5FA8]/50 hover:border-[#1F5FA8] rounded-2xl p-5 bg-[#edf4ff]/50 flex flex-col items-center justify-center text-center cursor-pointer transition-all">
+          <span class="material-symbols-outlined text-[#1F5FA8] text-3xl mb-1">cloud_upload</span>
+          <span class="text-xs font-bold text-[#1F5FA8]">Ketuk untuk Pilih File Dokumen</span>
+          <span class="text-[10px] text-[#6B7785] mt-0.5">PDF, JPG, atau PNG (Maks. 5 MB)</span>
+          <input id="file-upload-input" type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelected(this)" class="hidden"/>
+        </label>
+
+        <div id="file-preview-card" class="p-3 bg-[#F5F7FA] border border-[#E6E9ED] rounded-xl flex items-center justify-between">
+          <div class="flex items-center gap-2.5 truncate">
+            <span class="material-symbols-outlined text-[#D64550] text-[22px]">picture_as_pdf</span>
+            <div class="truncate">
+              <p id="uploaded-file-name" class="text-xs font-bold text-[#111d28] truncate">Proposal_Kegiatan_BEM_UB.pdf</p>
+              <p id="uploaded-file-size" class="text-[10px] text-[#2E9E6B] font-semibold">1.8 MB • Siap Dikirim</p>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-[#2E9E6B] text-[18px]">check_circle</span>
+        </div>
+      </div>
+
+      <!-- ================= STEP 4: TINJAU & KIRIM ================= -->
+      <div id="step-content-4" class="hidden bg-white border border-[#E6E9ED] rounded-2xl p-4 space-y-3.5 shadow-2xs">
+        <div class="flex items-center justify-between border-b border-[#E6E9ED] pb-2.5">
+          <h2 class="text-xs font-extrabold text-[#14325C]">Ringkasan Pengajuan</h2>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D8F1E4] text-[#2E9E6B]">Siap Dikirim</span>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between py-1 border-b border-[#E6E9ED]/60"><span class="text-[#6B7785]">Ruangan:</span><span id="rev-room" class="font-bold text-[#14325C]"></span></div>
+          <div class="flex justify-between py-1 border-b border-[#E6E9ED]/60"><span class="text-[#6B7785]">Tanggal &amp; Jam:</span><span id="rev-time" class="font-bold text-[#111d28]"></span></div>
+          <div class="flex justify-between py-1 border-b border-[#E6E9ED]/60"><span class="text-[#6B7785]">Kegiatan:</span><span id="rev-title" class="font-semibold text-right text-[#111d28]"></span></div>
+          <div class="flex justify-between py-1 border-b border-[#E6E9ED]/60"><span class="text-[#6B7785]">Penanggung Jawab:</span><span id="rev-pic" class="font-semibold text-right text-[#111d28]"></span></div>
+          <div class="flex justify-between py-1 border-b border-[#E6E9ED]/60"><span class="text-[#6B7785]">Jumlah Peserta:</span><span id="rev-part" class="font-semibold text-[#111d28]"></span></div>
+          <div class="flex justify-between py-1"><span class="text-[#6B7785]">Dokumen:</span><span id="rev-doc" class="font-semibold text-[#2E9E6B]"></span></div>
+        </div>
+
+        <label class="p-3 bg-[#edf4ff] rounded-xl border border-[#afcafd] flex items-start gap-2.5 cursor-pointer">
+          <input id="check-persetujuan" type="checkbox" checked onchange="updateBottomBar()" class="w-4 h-4 mt-0.5 rounded text-[#1F5FA8]"/>
+          <span class="text-[11px] text-[#111d28] leading-snug">
+            Saya menyatakan data pengajuan benar dan bersedia mematuhi seluruh <strong>Tata Tertib Penggunaan Ruangan Universitas Brawijaya</strong>.
+          </span>
+        </label>
+      </div>
+
+    </main>
+
+    <!-- Sticky Bottom Action Bar -->
+    <footer class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-40 bg-white border-t border-[#E6E9ED] px-4 py-3 flex items-center gap-2.5">
+      <button onclick="handleStepPrev()" type="button" class="h-11 px-4 rounded-xl border border-[#c2c6d3] text-xs font-bold text-[#424751]">
+        <span id="btn-back-text">Batal</span>
+      </button>
+      <button id="btn-primary-action" onclick="handleStepNext()" type="button" class="flex-1 h-11 px-4 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs">
+        <span id="btn-action-label">Lanjutkan</span>
+        <span class="material-symbols-outlined text-[18px]" id="btn-action-icon">arrow_forward</span>
+      </button>
+    </footer>
+
+  </div>
+
+  <script>
+    let currentStep = 1;
+    let isConflict = false;
+    let uploadedDocName = 'Proposal_Kegiatan_BEM_UB.pdf';
+
+    function populateRoomSelect() {
+      const rooms = window.SIPRK.getRooms().filter(r => r.status === 'tersedia');
+      const sel = document.getElementById('select-room');
+      const saved = window.SIPRK.getSelectedSlot();
+      sel.innerHTML = rooms.map(r => `
+        <option value="${r.id}" ${r.id === saved.roomId ? 'selected' : ''}>${r.name} (${r.buildingShort} • Maks ${r.capacity} Kursi)</option>
+      `).join('');
+
+      if (saved.date) document.getElementById('input-tanggal').value = saved.date;
+      if (saved.startTime) document.getElementById('input-jam-mulai').value = saved.startTime;
+      if (saved.endTime) document.getElementById('input-jam-selesai').value = saved.endTime;
+    }
+
+    function handleRoomOrTimeChange() {
+      const roomId = document.getElementById('select-room').value;
+      const room = window.SIPRK.getRoomById(roomId);
+      const dateVal = document.getElementById('input-tanggal').value;
+      const startVal = document.getElementById('input-jam-mulai').value;
+      const endVal = document.getElementById('input-jam-selesai').value;
+
+      document.getElementById('summary-room-name').textContent = room.name;
+      document.getElementById('summary-room-loc').textContent = `${room.building} • ${room.floor}`;
+      document.getElementById('summary-time-text').textContent = `${startVal} - ${endVal} WIB`;
+      document.getElementById('summary-cap-text').textContent = `Maks. ${room.capacity} Kursi`;
+      document.getElementById('max-cap-label').textContent = `Kapasitas Maks: ${room.capacity} Orang`;
+
+      if (dateVal) {
+        const d = new Date(dateVal);
+        document.getElementById('summary-date-text').textContent = d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+      }
+
+      // Check real schedule conflicts from db.schedules
+      const schedules = window.SIPRK.getSchedules();
+      const conflictSch = schedules.find(s => s.roomId === room.id && s.startTime <= startVal && s.endTime > startVal);
+      const conflictBanner = document.getElementById('conflict-banner');
+      const statusBadge = document.getElementById('room-status-badge');
+
+      if (conflictSch) {
+        isConflict = true;
+        conflictBanner.classList.remove('hidden');
+        document.getElementById('conflict-detail-text').textContent = `Bentrok dengan kuliah rutin ${conflictSch.code} ${conflictSch.courseName} (${conflictSch.startTime} - ${conflictSch.endTime} WIB).`;
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FFF1E6] text-[#D46B1D] flex items-center gap-1';
+        statusBadge.innerHTML = `<span class="material-symbols-outlined text-[14px]">warning</span><span>Bentrok Jadwal</span>`;
+      } else {
+        isConflict = false;
+        conflictBanner.classList.add('hidden');
+        statusBadge.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#D8F1E4] text-[#2E9E6B] flex items-center gap-1';
+        statusBadge.innerHTML = `<span class="material-symbols-outlined text-[14px]">check_circle</span><span>Bebas Bentrok</span>`;
+      }
+
+      validateCapacity();
+      updateBottomBar();
+    }
+
+    function resolveConflictTime() {
+      document.getElementById('input-jam-mulai').value = '13:00';
+      document.getElementById('input-jam-selesai').value = '14:40';
+      handleRoomOrTimeChange();
+    }
+
+    function validateCapacity() {
+      const roomId = document.getElementById('select-room').value;
+      const room = window.SIPRK.getRoomById(roomId);
+      const count = parseInt(document.getElementById('input-peserta').value) || 0;
+      const warn = document.getElementById('capacity-warning-box');
+      if (count > room.capacity) {
+        warn.classList.remove('hidden');
+      } else {
+        warn.classList.add('hidden');
+      }
+    }
+
+    function handleFileSelected(input) {
+      if (input.files && input.files[0]) {
+        const f = input.files[0];
+        if (f.size > 5 * 1024 * 1024) {
+          alert('Ukuran berkas melebihi batas maksimal 5 MB.');
+          return;
+        }
+        uploadedDocName = f.name;
+        document.getElementById('uploaded-file-name').textContent = f.name;
+        document.getElementById('uploaded-file-size').textContent = `${(f.size / (1024 * 1024)).toFixed(2)} MB • Siap Dikirim`;
+      }
+    }
+
+    function goToStep(step) {
+      if (step < 1 || step > 4) return;
+      currentStep = step;
+      for (let i = 1; i <= 4; i++) {
+        const panel = document.getElementById('step-content-' + i);
+        const badge = document.getElementById('step-badge-' + i);
+        const label = document.getElementById('step-label-' + i);
+        if (i === currentStep) {
+          panel.classList.remove('hidden');
+          badge.className = 'w-7 h-7 rounded-full bg-[#1F5FA8] text-white flex items-center justify-center text-xs font-bold ring-2 ring-white';
+          badge.textContent = i;
+          label.className = 'text-[10px] font-bold text-[#1F5FA8]';
+        } else if (i < currentStep) {
+          panel.classList.add('hidden');
+          badge.className = 'w-7 h-7 rounded-full bg-[#2E9E6B] text-white flex items-center justify-center text-xs font-bold ring-2 ring-white';
+          badge.innerHTML = '<span class="material-symbols-outlined text-[15px]">check</span>';
+          label.className = 'text-[10px] font-semibold text-[#2E9E6B]';
+        } else {
+          panel.classList.add('hidden');
+          badge.className = 'w-7 h-7 rounded-full bg-[#E6E9ED] text-[#424751] flex items-center justify-center text-xs font-medium ring-2 ring-white';
+          badge.textContent = i;
+          label.className = 'text-[10px] font-medium text-[#424751]';
+        }
+      }
+      document.getElementById('stepper-progress-line').style.width = `${((currentStep - 1) / 3) * 100}%`;
+
+      if (currentStep === 4) {
+        const room = window.SIPRK.getRoomById(document.getElementById('select-room').value);
+        document.getElementById('rev-room').textContent = `${room.name} (${room.buildingShort})`;
+        document.getElementById('rev-time').textContent = `${document.getElementById('summary-date-text').textContent} • ${document.getElementById('summary-time-text').textContent}`;
+        document.getElementById('rev-title').textContent = document.getElementById('input-nama-kegiatan').value;
+        document.getElementById('rev-pic').textContent = `${document.getElementById('input-pic').value} (${document.getElementById('input-kontak').value})`;
+        document.getElementById('rev-part').textContent = `${document.getElementById('input-peserta').value} Orang (Maks ${room.capacity})`;
+        document.getElementById('rev-doc').textContent = uploadedDocName;
+      }
+
+      updateBottomBar();
+    }
+
+    function updateBottomBar() {
+      const btn = document.getElementById('btn-primary-action');
+      const label = document.getElementById('btn-action-label');
+      const icon = document.getElementById('btn-action-icon');
+      document.getElementById('btn-back-text').textContent = currentStep === 1 ? 'Batal' : 'Kembali';
+
+      if (currentStep === 4) {
+        label.textContent = 'Kirim Pengajuan';
+        icon.textContent = 'send';
+        btn.className = 'flex-1 h-11 px-4 rounded-xl bg-[#2E9E6B] hover:bg-[#238056] disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs';
+        btn.disabled = !document.getElementById('check-persetujuan').checked || isConflict;
+      } else {
+        label.textContent = 'Lanjutkan';
+        icon.textContent = 'arrow_forward';
+        btn.className = 'flex-1 h-11 px-4 rounded-xl bg-[#1F5FA8] hover:bg-[#14325C] disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs';
+        btn.disabled = isConflict;
+      }
+    }
+
+    function handleStepPrev() {
+      if (currentStep > 1) goToStep(currentStep - 1);
+      else window.location.href = 's03-jadwal.html';
+    }
+
+    async function handleStepNext() {
+      if (isConflict) return;
+      if (currentStep < 4) {
+        goToStep(currentStep + 1);
+        return;
+      }
+
+      // Submit Real Booking to DB!
+      const btn = document.getElementById('btn-primary-action');
+      btn.disabled = true;
+      document.getElementById('btn-action-label').textContent = 'Mengirim Pengajuan...';
+
+      const created = await window.SIPRK.createBooking({
+        roomId: document.getElementById('select-room').value,
+        date: document.getElementById('input-tanggal').value,
+        dateFormatted: document.getElementById('summary-date-text').textContent,
+        startTime: document.getElementById('input-jam-mulai').value,
+        endTime: document.getElementById('input-jam-selesai').value,
+        category: document.getElementById('select-jenis').value,
+        courseInfo: document.getElementById('select-matkul-dosen')?.value || '',
+        title: document.getElementById('input-nama-kegiatan').value,
+        applicantName: document.getElementById('input-pic').value,
+        applicantPhone: document.getElementById('input-kontak').value,
+        participants: document.getElementById('input-peserta').value,
+        documentName: uploadedDocName,
+        isDraft: false
+      });
+
+      window.location.href = `s06-konfirmasi.html?id=${encodeURIComponent(created.id)}`;
+    }
+
+    async function saveAsDraft() {
+      await window.SIPRK.createBooking({
+        roomId: document.getElementById('select-room').value,
+        date: document.getElementById('input-tanggal').value,
+        dateFormatted: document.getElementById('summary-date-text').textContent,
+        startTime: document.getElementById('input-jam-mulai').value,
+        endTime: document.getElementById('input-jam-selesai').value,
+        category: document.getElementById('select-jenis').value,
+        title: document.getElementById('input-nama-kegiatan').value || 'Draf Pengajuan Ruangan',
+        applicantName: document.getElementById('input-pic').value,
+        applicantPhone: document.getElementById('input-kontak').value,
+        participants: document.getElementById('input-peserta').value,
+        documentName: uploadedDocName,
+        isDraft: true
+      });
+      window.location.href = 's07-peminjaman-saya.html';
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      await window.SIPRK.syncFromServer();
+      const s = window.SIPRK.getSession();
+
+      document.getElementById('role-description').textContent = `${s.name} (${s.organization})`;
+      document.getElementById('role-label').textContent = s.roleLabel;
+      document.getElementById('input-pic').value = s.name;
+      document.getElementById('input-kontak').value = s.phone || '0812-3456-7890';
+
+      if (s.role === 'dosen') {
+        document.getElementById('urgent-dosen-badge').classList.remove('hidden');
+        document.getElementById('date-rule-hint').textContent = 'H-0 Diizinkan (Dosen)';
+        document.getElementById('input-tanggal').min = '2026-10-19';
+        document.getElementById('doc-mandatory-tag').textContent = 'Opsional untuk Dosen (BR-10)';
+        document.getElementById('doc-mandatory-tag').className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-[#D8F1E4] text-[#2E9E6B]';
+        document.getElementById('select-jenis').innerHTML = `
+          <option value="Kelas Pengganti" selected>Kelas Pengganti (Dosen Pengampu)</option>
+          <option value="Ujian / Sidang Tugas Akhir">Ujian / Sidang Tugas Akhir</option>
+          <option value="Kuliah Tambahan">Kuliah Tambahan / Responsi</option>
+        `;
+        document.getElementById('dosen-matkul-container').classList.remove('hidden');
+        document.getElementById('input-nama-kegiatan').value = 'Kelas Pengganti: IF2101 Algoritma & Struktur Data (IF-3A)';
+        uploadedDocName = 'RPS_Kelas_Pengganti.pdf';
+        document.getElementById('uploaded-file-name').textContent = uploadedDocName;
+      }
+
+      populateRoomSelect();
+      handleRoomOrTimeChange();
+      goToStep(1);
+    });
+  </script>
+  <script src="../assets/siprk-nav.js"></script>
+</body>
+</html>
