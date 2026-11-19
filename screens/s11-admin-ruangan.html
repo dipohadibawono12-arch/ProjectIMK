@@ -39,15 +39,18 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="text-base font-extrabold tracking-tight leading-none">SIPRK Admin</span>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">SARPRAS</span>
+            <span id="adm-header-badge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">SARPRAS</span>
           </div>
           <span class="text-[10px] text-[#c5daff] block mt-0.5">Universitas Brawijaya • S11</span>
         </div>
       </div>
       <div class="flex items-center gap-1">
-        <button aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10">
+        <a href="s15-notifikasi.html" aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10">
           <span class="material-symbols-outlined text-[21px]">notifications</span>
-        </button>
+        </a>
+        <a id="adm-header-avatar" href="s10-profil.html" class="w-8 h-8 rounded-full bg-[#1F5FA8] border border-white/30 text-white text-xs font-bold flex items-center justify-center">
+          PH
+        </a>
       </div>
     </header>
 
@@ -337,7 +340,7 @@
             <span class="material-symbols-outlined text-[#D46B1D] text-[16px] mt-0.5">event_busy</span>
             <div>
               <p class="font-mono font-bold text-[#14325C] text-[10px]">${b.id}</p>
-              <p class="text-[#1B2733] font-medium">${b.title} (${b.dateLabel} ${b.startTime})</p>
+              <p class="text-[#1B2733] font-medium">${b.title} (${b.dateFormatted || b.dateLabel || b.date} ${b.startTime})</p>
             </div>
           </div>
         `).join('');
@@ -361,7 +364,16 @@
       setTimeout(() => t.classList.add('hidden'), 2800);
     }
 
-    window.addEventListener('DOMContentLoaded', renderRooms);
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.SIPRK) {
+        const s = window.SIPRK.getSession();
+        const badge = document.getElementById('adm-header-badge');
+        const avatar = document.getElementById('adm-header-avatar');
+        if (badge) badge.textContent = s.role === 'fakultas' ? 'DEKANAT' : 'SARPRAS';
+        if (avatar) avatar.textContent = s.avatar || 'PH';
+      }
+      renderRooms();
+    });
     window.addEventListener('siprk:db-synced', renderRooms);
   </script>
   <script src="../assets/siprk-nav.js"></script>

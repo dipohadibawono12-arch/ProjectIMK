@@ -3,10 +3,10 @@
  * Connects to /api/* (server.js -> data/db.json) with automatic localStorage persistence fallback
  */
 window.SIPRK = (function () {
-  const SESSION_KEY = 'siprk_ub_active_session_v2';
-  const DB_CACHE_KEY = 'siprk_ub_db_state_v2';
-  const SLOT_KEY = 'siprk_ub_selected_slot_v2';
-  const LAST_BOOKING_KEY = 'siprk_ub_last_booking_v2';
+  const SESSION_KEY = 'siprk_ub_active_session_v4';
+  const DB_CACHE_KEY = 'siprk_ub_db_state_v4';
+  const SLOT_KEY = 'siprk_ub_selected_slot_v4';
+  const LAST_BOOKING_KEY = 'siprk_ub_last_booking_v4';
 
   const ALLOWED_SCREENS = {
     mahasiswa: [
@@ -38,6 +38,21 @@ window.SIPRK = (function () {
     ],
     admin: [
       's01-login.html',
+      's03-jadwal.html',
+      's04-detail-ruangan.html',
+      's10-admin-pengajuan.html',
+      's11-admin-ruangan.html',
+      's12-admin-jadwal.html',
+      's13-admin-rekap.html',
+      's14-admin-dashboard.html',
+      's15-notifikasi.html',
+      's10-profil.html',
+      's17-error.html'
+    ],
+    fakultas: [
+      's01-login.html',
+      's03-jadwal.html',
+      's04-detail-ruangan.html',
       's10-admin-pengajuan.html',
       's11-admin-ruangan.html',
       's12-admin-jadwal.html',
@@ -104,6 +119,24 @@ window.SIPRK = (function () {
         avatar: 'PH',
         homeScreen: 's10-admin-pengajuan.html',
         badgeClass: 'bg-[#FFF0C2] text-[#C98A00]'
+      },
+      {
+        id: 'u-fak-1',
+        role: 'fakultas',
+        roleLabel: 'Dekanat / Fakultas',
+        name: 'Dr. Sari Wulandari, S.Kom., M.Sc.',
+        shortName: 'Bu Sari',
+        email: 'dekanat@ub.ac.id',
+        idLabel: 'NIP',
+        idNumber: '197611042002122001',
+        password: 'fakultas123',
+        prodi: 'Dekanat Fakultas Ilmu Komputer - UB',
+        organization: 'Dekanat / Fakultas FILKOM UB',
+        semester: 'Operasional Dekanat 2026',
+        phone: '0812-9988-7766',
+        avatar: 'SW',
+        homeScreen: 's14-admin-dashboard.html',
+        badgeClass: 'bg-[#DCEBFA] text-[#14325C]'
       }
     ],
     rooms: [
@@ -539,17 +572,32 @@ window.SIPRK = (function () {
   };
 
   function getDB() {
+    let db = null;
     try {
       const raw = localStorage.getItem(DB_CACHE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && parsed.users && parsed.rooms && parsed.bookings) {
-          return parsed;
-        }
+        db = JSON.parse(raw);
       }
     } catch (e) {}
-    saveDB(DEFAULT_DB);
-    return JSON.parse(JSON.stringify(DEFAULT_DB));
+
+    if (!db || !db.users || !db.rooms || !db.bookings) {
+      db = JSON.parse(JSON.stringify(DEFAULT_DB));
+      saveDB(db);
+      return db;
+    }
+
+    // Selalu sinkronkan akun default agar kredensial admin, dosen, mhs, fakultas selalu up-to-date
+    DEFAULT_DB.users.forEach(defU => {
+      const idx = db.users.findIndex(u => u.id === defU.id || u.role === defU.role);
+      if (idx >= 0) {
+        db.users[idx] = Object.assign({}, db.users[idx], defU);
+      } else {
+        db.users.push(defU);
+      }
+    });
+
+    saveDB(db);
+    return db;
   }
 
   function saveDB(db) {
@@ -618,9 +666,51 @@ window.SIPRK = (function () {
     return decorated;
   }
 
+  function matchUserCredentials(u, cleanId, cleanPass) {
+    const email = (u.email || '').toLowerCase();
+    const idNum = (u.idNumber || '').toLowerCase();
+    const role = (u.role || '').toLowerCase();
+    const shortName = (u.shortName || '').toLowerCase();
+    const name = (u.name || '').toLowerCase();
+
+    // Check identifier (Email, NIM/NIP, Role, atau Nama Panggilan)
+    let idMatched = (email === cleanId || idNum === cleanId || cleanId === role);
+    if (!idMatched && role === 'admin') {
+      if (['sarpras', 'admin sarpras', 'adminsarpras', 'admin-sarpras', 'hadi', 'pak hadi'].includes(cleanId) || cleanId.startsWith('admin')) {
+        idMatched = true;
+      }
+    } else if (!idMatched && role === 'fakultas') {
+      if (['dekanat', 'fakultas', 'dekan', 'sari', 'bu sari', 'filkom'].includes(cleanId) || cleanId.startsWith('dekanat')) {
+        idMatched = true;
+      }
+    } else if (!idMatched && role === 'dosen') {
+      if (['dosen', 'rina', 'dr. rina', 'dr rina'].includes(cleanId) || cleanId.startsWith('rina')) {
+        idMatched = true;
+      }
+    } else if (!idMatched && role === 'mahasiswa') {
+      if (['mahasiswa', 'mhs', 'rani', 'rani maharani'].includes(cleanId) || cleanId.startsWith('rani')) {
+        idMatched = true;
+      }
+    }
+    if (!idMatched && (cleanId === shortName || cleanId === name)) {
+      idMatched = true;
+    }
+
+    if (!idMatched) return false;
+
+    // Password matching (termasuk toleransi huruf kecil/tanpa angka untuk kemudahan demo)
+    if (u.password === cleanPass) return true;
+    if (role === 'admin' && ['admin', 'admin123', 'sarpras123', 'sarpras'].includes(cleanPass)) return true;
+    if (role === 'fakultas' && ['fakultas', 'fakultas123', 'dekanat', 'dekanat123'].includes(cleanPass)) return true;
+    if (role === 'dosen' && ['dosen', 'dosen123'].includes(cleanPass)) return true;
+    if (role === 'mahasiswa' && ['mahasiswa', 'mahasiswa123'].includes(cleanPass)) return true;
+
+    return false;
+  }
+
   async function loginWithCredentials(identifier, password) {
     const cleanId = String(identifier || '').trim().toLowerCase();
-    const cleanPass = String(password || '');
+    const cleanPass = String(password || '').trim();
 
     // Try server API first if running on HTTP
     if (window.location.protocol.startsWith('http')) {
@@ -641,12 +731,9 @@ window.SIPRK = (function () {
       } catch (e) {}
     }
 
-    // Local DB lookup
+    // Local DB lookup dengan pemetaan fleksibel
     const db = getDB();
-    const found = db.users.find(u =>
-      (u.email.toLowerCase() === cleanId || u.idNumber.toLowerCase() === cleanId) &&
-      u.password === cleanPass
-    );
+    const found = db.users.find(u => matchUserCredentials(u, cleanId, cleanPass));
     if (!found) {
       return {
         ok: false,
@@ -1129,14 +1216,20 @@ window.SIPRK = (function () {
 
   function getNotifications() {
     const session = getSession();
-    return getDB().notifications.filter(n => n.targetRole === session.role);
+    const isMgmt = session.role === 'admin' || session.role === 'fakultas';
+    return getDB().notifications.filter(n =>
+      isMgmt ? (n.targetRole === 'admin' || n.targetRole === 'fakultas') : n.targetRole === session.role
+    );
   }
 
   async function markAllNotificationsRead() {
     const db = getDB();
     const session = getSession();
+    const isMgmt = session.role === 'admin' || session.role === 'fakultas';
     db.notifications.forEach(n => {
-      if (n.targetRole === session.role) n.unread = false;
+      if (isMgmt ? (n.targetRole === 'admin' || n.targetRole === 'fakultas') : n.targetRole === session.role) {
+        n.unread = false;
+      }
     });
     saveDB(db);
     await apiCall('/api/notifications/read-all', 'POST', { role: session.role });
@@ -1190,7 +1283,7 @@ window.SIPRK = (function () {
         { file: 's07-peminjaman-saya.html', label: 'Pengajuan', icon: 'assignment' },
         { file: 's10-profil.html', label: 'Profil', icon: 'account_circle' }
       ];
-    } else if (role === 'admin') {
+    } else if (role === 'admin' || role === 'fakultas') {
       tabs = [
         { file: 's14-admin-dashboard.html', label: 'Dashboard', icon: 'monitoring' },
         { file: 's10-admin-pengajuan.html', label: 'Pengajuan', icon: 'inbox', badge: pendingCount > 0 ? String(pendingCount) : '' },

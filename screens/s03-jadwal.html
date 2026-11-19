@@ -33,7 +33,7 @@
     <!-- Top App Bar -->
     <header class="sticky top-0 z-40 flex justify-between items-center px-4 h-14 bg-white border-b border-[#E6E9ED] shadow-2xs">
       <div class="flex items-center gap-2.5">
-        <a href="s02-beranda.html" class="w-9 h-9 rounded-xl bg-[#14325C] p-1 flex items-center justify-center shadow-xs">
+        <a id="jadwal-home-link" href="s02-beranda.html" class="w-9 h-9 rounded-xl bg-[#14325C] p-1 flex items-center justify-center shadow-xs">
           <img src="../assets/logo-ub.png" alt="Logo UB" class="w-full h-full object-contain"/>
         </a>
         <div>
@@ -443,6 +443,9 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       await window.SIPRK.syncFromServer();
+      const s = window.SIPRK.getSession();
+      const homeLink = document.getElementById('jadwal-home-link');
+      if (homeLink && s && s.homeScreen) homeLink.href = s.homeScreen;
       ensureValidSelectedSlot();
       renderDateStrip();
       updateStickyBar();

@@ -5,7 +5,7 @@ Aplikasi mobile web (`max-w-[430px]`) untuk peminjaman dan ketersediaan ruangan 
 
 ---
 
-## 👥 Daftar Akun Pengguna Resmi (3 Peran)
+## 👥 Daftar Akun Pengguna Resmi (4 Peran)
 
 Sistem membedakan fitur dan hak akses secara otomatis berdasarkan akun yang dimasukkan di halaman login **`screens/s01-login.html`**:
 
@@ -13,7 +13,8 @@ Sistem membedakan fitur dan hak akses secara otomatis berdasarkan akun yang dima
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Mahasiswa / Ormawa** | Rani Maharani | `rani@student.ub.ac.id` | `225150200111045` | `mahasiswa123` | • Form Peminjaman 4-Langkah (H-1)<br>• Unggah Berkas Proposal / Surat Izin<br>• Simpan Draf & Batalkan Pengajuan<br>• Status Pengajuan (Menunggu, Disetujui, Ditolak)<br>• E-Tiket Digital |
 | **Dosen Pengampu** | Dr. Rina Kusuma, S.Kom., M.T. | `rina@ub.ac.id` | `198508172012122002` | `dosen123` | • Pengajuan Kelas Pengganti Mendesak (Bisa H-0)<br>• Filter Ruangan berdasarkan Fasilitas Ajar<br>• Jadwal Mengajar Saya & Ekspor Kalender (`.ics`)<br>• Status Pengajuan (Menunggu, Disetujui, Ditolak) |
-| **Admin Sarpras** *(Satu-satunya Admin)* | Hadi Suryono, S.AP. | `admin@ub.ac.id` | `197903112005011001` | `admin123` | • **Pengajuan Masuk Otomatis:** Seluruh pengajuan mahasiswa & dosen langsung masuk ke antrean verifikasi Admin Sarpras<br>• **Keputusan:** **Setujui** atau **Tolak** (wajib menyertakan penjelasan kenapa ruangan tidak dapat digunakan, min. 10 karakter)<br>• **Master Data Ruangan:** Tambah, ubah data, dan ubah status Tersedia / Maintenance<br>• **Jadwal Perkuliahan:** Tambah jadwal manual & impor jadwal CSV<br>• **Rekap PIC & Dashboard Evaluasi:** Pantau utilisasi dan okupansi ruangan |
+| **Admin Sarpras** | Hadi Suryono, S.AP. | `admin@ub.ac.id` | `197903112005011001` | `admin123` | • **Pengajuan Masuk Otomatis:** Seluruh pengajuan mahasiswa & dosen langsung masuk ke antrean verifikasi Admin Sarpras<br>• **Keputusan:** **Setujui** atau **Tolak** (wajib menyertakan alasan penolakan min. 10 karakter)<br>• **Master Data Ruangan:** Tambah, ubah data, dan ubah status Tersedia / Maintenance<br>• **Jadwal Perkuliahan:** Tambah jadwal manual & impor jadwal CSV<br>• **Cari Ruangan, Rekap PIC & Dashboard Evaluasi** |
+| **Dekanat / Fakultas** | Dr. Sari Wulandari, S.Kom., M.Sc. | `dekanat@ub.ac.id` | `197611042002122001` | `fakultas123` | • **Dashboard Statistik Penggunaan Ruangan & Unduh Laporan Evaluasi Periodik**<br>• **Cari Ruangan & Cek Ketersediaan Real-time**<br>• **Fungsi Penuh seperti Sarpras:** Tinjau Pengajuan Masuk (Setujui / Tolak), Manajemen Master Ruangan & Perencanaan Pemeliharaan/Aset, Jadwal Kuliah CSV, dan Rekap Pelacakan PIC |
 
 ---
 

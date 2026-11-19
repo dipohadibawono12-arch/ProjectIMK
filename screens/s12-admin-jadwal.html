@@ -160,7 +160,7 @@
 <div>
 <div class="flex items-center gap-2">
 <span class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold">SIPRK</span>
-<span class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full border border-outline-variant font-semibold">ADMIN</span>
+<span id="adm-header-badge" class="bg-surface-container text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full border border-outline-variant font-semibold">ADMIN</span>
 </div>
 </div>
 </div>
@@ -169,6 +169,7 @@
 <span class="material-symbols-outlined" data-icon="notifications">notifications</span>
 <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-error rounded-full"></span>
 </a>
+<a id="adm-header-avatar" href="s10-profil.html" class="w-8 h-8 rounded-full bg-[#14325C] text-white text-xs font-bold flex items-center justify-center">PH</a>
 </div>
 </header>
 <!-- MAIN SCROLLABLE CONTAINER -->
@@ -925,7 +926,16 @@
       }, 3000);
     }
 
-    window.addEventListener('DOMContentLoaded', renderSchedules);
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.SIPRK) {
+        const s = window.SIPRK.getSession();
+        const badge = document.getElementById('adm-header-badge');
+        const avatar = document.getElementById('adm-header-avatar');
+        if (badge) badge.textContent = s.role === 'fakultas' ? 'DEKANAT' : 'SARPRAS';
+        if (avatar) avatar.textContent = s.avatar || 'PH';
+      }
+      renderSchedules();
+    });
     window.addEventListener('siprk:db-synced', renderSchedules);
   </script>
   <script src="../assets/siprk-nav.js"></script>

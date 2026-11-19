@@ -50,6 +50,23 @@
       "phone": "0813-5566-7788",
       "avatar": "PH",
       "homeScreen": "s10-admin-pengajuan.html"
+    },
+    {
+      "id": "u-fak-1",
+      "role": "fakultas",
+      "roleLabel": "Dekanat / Fakultas",
+      "name": "Dr. Sari Wulandari, S.Kom., M.Sc.",
+      "shortName": "Bu Sari",
+      "email": "dekanat@ub.ac.id",
+      "idLabel": "NIP",
+      "idNumber": "197611042002122001",
+      "password": "fakultas123",
+      "prodi": "Dekanat Fakultas Ilmu Komputer - UB",
+      "organization": "Dekanat / Fakultas FILKOM UB",
+      "semester": "Operasional Dekanat 2026",
+      "phone": "0812-9988-7766",
+      "avatar": "SW",
+      "homeScreen": "s14-admin-dashboard.html"
     }
   ],
   "rooms": [

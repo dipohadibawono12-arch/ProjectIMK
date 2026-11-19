@@ -80,9 +80,12 @@
   <script>
     function setErrorType(type) {
       ['403', '404', 'offline'].forEach(t => {
-        document.getElementById('ebtn-' + t).className = (t === type)
-          ? 'px-2 py-1 rounded text-[10px] font-bold bg-[#1F5FA8] text-white'
-          : 'px-2 py-1 rounded text-[10px] font-medium bg-[#F5F7FA] text-[#424751]';
+        const el = document.getElementById('ebtn-' + t);
+        if (el) {
+          el.className = (t === type)
+            ? 'px-2 py-1 rounded text-[10px] font-bold bg-[#1F5FA8] text-white'
+            : 'px-2 py-1 rounded text-[10px] font-medium bg-[#F5F7FA] text-[#424751]';
+        }
       });
       const s = window.SIPRK.getSession();
       const iconBox = document.getElementById('err-icon-box');

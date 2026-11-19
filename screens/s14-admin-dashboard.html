@@ -38,15 +38,18 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="text-base font-extrabold tracking-tight leading-none">SIPRK Evaluasi</span>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">S14</span>
+            <span id="header-role-badge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">SARPRAS</span>
           </div>
           <span id="header-role-sub" class="text-[10px] text-[#c5daff] block mt-0.5">Universitas Brawijaya</span>
         </div>
       </div>
       <div class="flex items-center gap-1">
-        <button aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10">
+        <a href="s15-notifikasi.html" aria-label="Notifikasi" class="relative w-9 h-9 rounded-full flex items-center justify-center text-white/90 hover:bg-white/10">
           <span class="material-symbols-outlined text-[21px]">notifications</span>
-        </button>
+        </a>
+        <a id="header-avatar-link" href="s10-profil.html" class="w-8 h-8 rounded-full bg-[#1F5FA8] border border-white/30 text-white text-xs font-bold flex items-center justify-center">
+          SW
+        </a>
       </div>
     </header>
 
@@ -70,6 +73,22 @@
             <span class="material-symbols-outlined text-[17px]">download</span>
             <span>Unduh Laporan</span>
           </button>
+        </div>
+
+        <!-- Quick Portal Actions (Cari Ruangan, Verifikasi Pengajuan, Aset & Maintenance) -->
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#E6E9ED]">
+          <a href="s03-jadwal.html" class="p-2.5 rounded-xl bg-[#edf4ff] hover:bg-[#DCEBFA] border border-[#afcafd] flex flex-col items-center text-center gap-1 transition-colors">
+            <span class="material-symbols-outlined text-[#1F5FA8] text-[20px]">search</span>
+            <span class="text-[10px] font-bold text-[#14325C] leading-tight">Cari Ruangan</span>
+          </a>
+          <a href="s10-admin-pengajuan.html" class="p-2.5 rounded-xl bg-[#FFF0C2]/60 hover:bg-[#FFF0C2] border border-[#C98A00]/30 flex flex-col items-center text-center gap-1 transition-colors">
+            <span class="material-symbols-outlined text-[#8C6000] text-[20px]">inbox</span>
+            <span class="text-[10px] font-bold text-[#14325C] leading-tight">Tinjau Pengajuan</span>
+          </a>
+          <a href="s11-admin-ruangan.html" class="p-2.5 rounded-xl bg-[#D8F1E4]/60 hover:bg-[#D8F1E4] border border-[#2E9E6B]/30 flex flex-col items-center text-center gap-1 transition-colors">
+            <span class="material-symbols-outlined text-[#2E9E6B] text-[20px]">build</span>
+            <span class="text-[10px] font-bold text-[#14325C] leading-tight">Aset &amp; Ruangan</span>
+          </a>
         </div>
       </section>
 
@@ -104,9 +123,9 @@
             <span class="text-[11px] font-medium text-[#6B7785] block mt-0.5">Ditolak 9%</span>
           </div>
           <div class="bg-white rounded-xl border border-[#E6E9ED] p-3.5 shadow-2xs">
-            <span class="text-[11px] font-medium text-[#6B7785] block">Konflik terdeteksi</span>
-            <span id="kpi-conf" class="text-2xl font-extrabold text-[#1B2733] tabular-nums block mt-0.5">14</span>
-            <span class="text-[11px] font-bold text-[#2E9E6B] block mt-0.5">-4 vs bulan lalu</span>
+            <span class="text-[11px] font-medium text-[#6B7785] block">Menunggu verifikasi</span>
+            <span id="kpi-conf" class="text-2xl font-extrabold text-[#1B2733] tabular-nums block mt-0.5">1</span>
+            <span class="text-[11px] font-bold text-[#C98A00] block mt-0.5">Antrean Sarpras</span>
           </div>
         </section>
 
@@ -258,6 +277,7 @@
       const bookings = (window.SIPRK ? window.SIPRK.getBookings() : []).filter(b => b.status !== 'draft' && b.status !== 'draf');
       const total = bookings.length;
       const approved = bookings.filter(b => b.status === 'disetujui').length;
+      const pending = bookings.filter(b => b.status === 'menunggu' || b.status === 'pending').length;
       const appPct = total > 0 ? Math.round((approved / total) * 100) : 80;
 
       const period = document.getElementById('period-select').value;
@@ -266,13 +286,13 @@
         document.getElementById('donut-total').textContent = (total + 1120).toLocaleString('id-ID');
         document.getElementById('kpi-occ').textContent = '74%';
         document.getElementById('kpi-app').textContent = '86%';
-        document.getElementById('kpi-conf').textContent = '0';
+        document.getElementById('kpi-conf').textContent = String(pending);
       } else {
         document.getElementById('kpi-total').textContent = String(total + 240);
         document.getElementById('donut-total').textContent = String(total + 240);
         document.getElementById('kpi-occ').textContent = '68%';
         document.getElementById('kpi-app').textContent = `${appPct}%`;
-        document.getElementById('kpi-conf').textContent = '0';
+        document.getElementById('kpi-conf').textContent = String(pending);
       }
     }
 
@@ -287,12 +307,34 @@
     function downloadReport(type) {
       document.getElementById('export-modal').classList.add('hidden');
       const period = document.getElementById('period-select').value;
-      alert(`Berhasil mengunduh: Laporan_Okupansi_SIPRK_UB_${period}_2026-10-19.${type === 'PDF' ? 'pdf' : 'xlsx'}`);
+      const bookings = window.SIPRK ? window.SIPRK.getBookings() : [];
+      const rows = [['Kode', 'Kegiatan', 'Ruangan', 'Tanggal', 'Jam', 'Pemohon', 'Status']];
+      bookings.forEach(b => {
+        rows.push([b.code || b.id, b.title, b.roomName, b.dateFormatted || b.date, `${b.startTime}-${b.endTime}`, b.applicantName, b.status]);
+      });
+      const csv = rows.map(r => r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const ext = type === 'PDF' ? 'csv' : 'csv';
+      const filename = `Laporan_Okupansi_SIPRK_UB_${period}_2026.${ext}`;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      alert(`Berhasil mengunduh laporan evaluasi (${type}): ${filename}`);
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
+      if (window.SIPRK) await window.SIPRK.syncFromServer();
       const s = window.SIPRK.getSession();
       document.getElementById('header-role-sub').textContent = `${s.shortName} (${s.roleLabel}) • UB`;
+      const badgeEl = document.getElementById('header-role-badge');
+      if (badgeEl) badgeEl.textContent = s.role === 'fakultas' ? 'DEKANAT' : 'SARPRAS';
+      const avatarEl = document.getElementById('header-avatar-link');
+      if (avatarEl) avatarEl.textContent = s.avatar || 'SW';
       renderDashboardKPIs();
     });
     window.addEventListener('siprk:db-synced', renderDashboardKPIs);

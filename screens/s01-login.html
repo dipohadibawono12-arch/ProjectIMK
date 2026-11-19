@@ -140,6 +140,63 @@
               </svg>
             </button>
           </form>
+
+          <!-- Quick Fill / Akun Demo SSO -->
+          <div class="pt-3 border-t border-[#E6E9ED] space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold text-[#14325C] flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-[#D4AF37]">vpn_key</span>
+                Akun Demo SSO (Klik untuk Isi &amp; Masuk)
+              </span>
+              <span class="text-[10px] text-[#6B7785] font-medium">Otomatis Terisi</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <!-- Admin Sarpras -->
+              <button type="button" onclick="quickFillAccount('admin')" class="p-2.5 rounded-xl border-2 border-[#D4AF37] bg-[#FFFDF5] hover:bg-[#FFF8E7] active:scale-[0.97] text-left transition-all shadow-xs group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#FFF0C2] text-[#8C6000]">ADMIN SARPRAS</span>
+                  <span class="material-symbols-outlined text-[14px] text-[#8C6000] group-hover:translate-x-0.5 transition-transform">login</span>
+                </div>
+                <div class="text-[11px] font-bold text-[#14325C] truncate">Pak Hadi (Sarpras)</div>
+                <div class="text-[10px] text-[#6B7785] truncate font-mono">admin@ub.ac.id</div>
+                <div class="text-[9px] text-[#2E9E6B] font-bold mt-0.5">Sandi: admin123</div>
+              </button>
+
+              <!-- Dekanat / Fakultas -->
+              <button type="button" onclick="quickFillAccount('fakultas')" class="p-2.5 rounded-xl border border-[#afcafd] bg-[#f7faff] hover:bg-[#edf4ff] active:scale-[0.97] text-left transition-all shadow-xs group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#DCEBFA] text-[#14325C]">DEKANAT</span>
+                  <span class="material-symbols-outlined text-[14px] text-[#1F5FA8] group-hover:translate-x-0.5 transition-transform">login</span>
+                </div>
+                <div class="text-[11px] font-bold text-[#14325C] truncate">Dr. Sari (Dekanat)</div>
+                <div class="text-[10px] text-[#6B7785] truncate font-mono">dekanat@ub.ac.id</div>
+                <div class="text-[9px] text-[#2E9E6B] font-bold mt-0.5">Sandi: fakultas123</div>
+              </button>
+
+              <!-- Dosen Pengampu -->
+              <button type="button" onclick="quickFillAccount('dosen')" class="p-2.5 rounded-xl border border-[#b2e2cb] bg-[#f7fdfa] hover:bg-[#ebfbf3] active:scale-[0.97] text-left transition-all shadow-xs group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#D8F1E4] text-[#1E744E]">DOSEN</span>
+                  <span class="material-symbols-outlined text-[14px] text-[#2E9E6B] group-hover:translate-x-0.5 transition-transform">login</span>
+                </div>
+                <div class="text-[11px] font-bold text-[#14325C] truncate">Dr. Rina Kusuma</div>
+                <div class="text-[10px] text-[#6B7785] truncate font-mono">rina@ub.ac.id</div>
+                <div class="text-[9px] text-[#2E9E6B] font-bold mt-0.5">Sandi: dosen123</div>
+              </button>
+
+              <!-- Mahasiswa -->
+              <button type="button" onclick="quickFillAccount('mahasiswa')" class="p-2.5 rounded-xl border border-[#c2c6d3] bg-[#FAFBFD] hover:bg-[#F0F3F8] active:scale-[0.97] text-left transition-all shadow-xs group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#E6ECF5] text-[#1B4379]">MAHASISWA</span>
+                  <span class="material-symbols-outlined text-[14px] text-[#1F5FA8] group-hover:translate-x-0.5 transition-transform">login</span>
+                </div>
+                <div class="text-[11px] font-bold text-[#14325C] truncate">Rani Maharani</div>
+                <div class="text-[10px] text-[#6B7785] truncate font-mono">rani@student.ub.ac.id</div>
+                <div class="text-[9px] text-[#2E9E6B] font-bold mt-0.5">Sandi: mahasiswa123</div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -197,6 +254,39 @@
   </div>
 
   <script>
+    function quickFillAccount(role) {
+      const idInput = document.getElementById('input-sso-id');
+      const passInput = document.getElementById('input-sso-pass');
+      const errBox = document.getElementById('inline-auth-error');
+      errBox.classList.add('hidden');
+      passInput.classList.remove('border-[#D64550]', 'ring-1', 'ring-[#D64550]');
+
+      if (role === 'admin') {
+        idInput.value = 'admin@ub.ac.id';
+        passInput.value = 'admin123';
+      } else if (role === 'fakultas') {
+        idInput.value = 'dekanat@ub.ac.id';
+        passInput.value = 'fakultas123';
+      } else if (role === 'dosen') {
+        idInput.value = 'rina@ub.ac.id';
+        passInput.value = 'dosen123';
+      } else if (role === 'mahasiswa') {
+        idInput.value = 'rani@student.ub.ac.id';
+        passInput.value = 'mahasiswa123';
+      }
+
+      // Animasi feedback visual
+      idInput.classList.add('ring-2', 'ring-[#2E9E6B]', 'border-[#2E9E6B]');
+      passInput.classList.add('ring-2', 'ring-[#2E9E6B]', 'border-[#2E9E6B]');
+      setTimeout(() => {
+        idInput.classList.remove('ring-2', 'ring-[#2E9E6B]', 'border-[#2E9E6B]');
+        passInput.classList.remove('ring-2', 'ring-[#2E9E6B]', 'border-[#2E9E6B]');
+      }, 700);
+
+      // Trigger login otomatis
+      handleFormSubmit(new Event('submit'));
+    }
+
     function togglePasswordVisibility() {
       const inp = document.getElementById('input-sso-pass');
       const icon = document.getElementById('pass-toggle-icon');
@@ -210,14 +300,14 @@
     }
 
     async function handleFormSubmit(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const idInput = document.getElementById('input-sso-id');
       const passInput = document.getElementById('input-sso-pass');
       const errBox = document.getElementById('inline-auth-error');
       const errText = document.getElementById('inline-auth-error-text');
 
       const identifier = (idInput.value || '').trim();
-      const password = passInput.value || '';
+      const password = (passInput.value || '').trim();
 
       if (!identifier || !password) {
         errText.textContent = 'Harap isi Email/NIM/NIP dan kata sandi SSO Anda.';

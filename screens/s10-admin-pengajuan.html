@@ -39,7 +39,7 @@
         <div>
           <div class="flex items-center gap-1.5">
             <span class="text-base font-extrabold tracking-tight leading-none">SIPRK Admin</span>
-            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">SARPRAS</span>
+            <span id="adm-header-badge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FFF0C2] text-[#8C6000]">SARPRAS</span>
           </div>
           <span class="text-[10px] text-[#c5daff] block mt-0.5">Universitas Brawijaya • S10</span>
         </div>
@@ -49,8 +49,8 @@
           <span class="material-symbols-outlined text-[21px]">notifications</span>
           <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#D64550]"></span>
         </a>
-        <a href="s10-profil.html" class="w-8 h-8 rounded-full bg-[#1F5FA8] border border-white/30 text-white text-xs font-bold flex items-center justify-center">
-          HS
+        <a id="adm-header-avatar" href="s10-profil.html" class="w-8 h-8 rounded-full bg-[#1F5FA8] border border-white/30 text-white text-xs font-bold flex items-center justify-center">
+          PH
         </a>
       </div>
     </header>
@@ -423,7 +423,16 @@
       setTimeout(() => t.classList.add('hidden'), 3000);
     }
 
-    window.addEventListener('DOMContentLoaded', renderSubmissions);
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.SIPRK) {
+        const s = window.SIPRK.getSession();
+        const badge = document.getElementById('adm-header-badge');
+        const avatar = document.getElementById('adm-header-avatar');
+        if (badge) badge.textContent = s.role === 'fakultas' ? 'DEKANAT' : 'SARPRAS';
+        if (avatar) avatar.textContent = s.avatar || 'PH';
+      }
+      renderSubmissions();
+    });
     window.addEventListener('siprk:db-synced', renderSubmissions);
   </script>
   <script src="../assets/siprk-nav.js"></script>
